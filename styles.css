@@ -59,11 +59,15 @@ body {
 
 .thinking-step {
     display: flex;
-    align-items: center;
     gap: 8px;
     margin-bottom: 4px;
     opacity: 0.7;
     transition: all 0.3s;
+}
+
+/* Flexbox hizalama - thinking-step için */
+.thinking-step {
+    align-items: center;
 }
 
 .thinking-step.active {

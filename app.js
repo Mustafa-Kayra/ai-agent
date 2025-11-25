@@ -121,7 +121,8 @@ const Storage = {
 };
 
 // --- OPTİMİZASYON: Sessiz Error Handling (Production) ---
-const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+// Production ortamı tespiti - localhost, 127.0.0.1 ve ::1 (IPv6 localhost) kontrol edilir
+const isProduction = !['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
 
 function logError(error, context = '') {
     if (!isProduction) {
@@ -564,13 +565,17 @@ function setupEventListeners() {
     });
     
     // OPTİMİZASYON: Event delegation ile mod butonları
-    document.querySelector('.grid.grid-cols-1').addEventListener('click', (e) => {
-        const modeBtn = e.target.closest('.mode-btn');
-        if (modeBtn) {
-            const mode = modeBtn.id.replace('btn-mode-', '');
-            setMode(mode);
-        }
-    });
+    // ID selector kullanarak daha stabil bir çözüm
+    const modeButtonsContainer = document.getElementById('mode-buttons-container');
+    if (modeButtonsContainer) {
+        modeButtonsContainer.addEventListener('click', (e) => {
+            const modeBtn = e.target.closest('.mode-btn');
+            if (modeBtn) {
+                const mode = modeBtn.id.replace('btn-mode-', '');
+                setMode(mode);
+            }
+        });
+    }
 }
 
 // DOM hazır olduğunda uygulamayı başlat
