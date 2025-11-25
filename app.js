@@ -502,27 +502,50 @@ async function deployCode(btn) {
     
     const code = btn.getAttribute('data-code').replace(/&quot;/g, '"');
     const originalHtml = btn.innerHTML;
-    btn.innerHTML = `<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i>`;
+    const originalClass = btn.className; // Orijinal class'ı sakla
+    
+    btn.innerHTML = `<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Hazırlanıyor...`;
     btn.disabled = true;
 
     try {
         const randomId = Math.random().toString(36).substring(7);
         const subdomain = `pro-${randomId}`;
         const dir = `www_${randomId}`;
+        
+        // 1. Klasör oluştur
         await puter.fs.mkdir(dir);
+        
+        // 2. index.html yaz
         await puter.fs.write(`${dir}/index.html`, code);
+        
+        // 3. Hosting oluştur
+        btn.innerHTML = `<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Yayınlanıyor...`;
         const site = await puter.hosting.create(subdomain, dir);
         
+        console.log("Hosting Response:", site); // Debug
+        
+        // URL'i oluştur
+        const finalSubdomain = site.subdomain || subdomain;
+        const url = `https://${finalSubdomain}.puter.site`;
+        
         btn.className = "text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg flex items-center gap-2 transition-colors";
-        btn.innerHTML = `<i data-lucide="external-link" class="w-3 h-3"></i> ${site.subdomain}`;
-        btn.onclick = () => window.open(`https://${site.subdomain}.puter.site`, '_blank');
+        btn.innerHTML = `<i data-lucide="external-link" class="w-3 h-3"></i> ${finalSubdomain}`;
+        
+        btn.onclick = (e) => {
+            e.preventDefault();
+            window.open(url, '_blank');
+        };
+        
     } catch (err) {
         logError(err, 'deployCode');
-        btn.innerHTML = `Hata`;
+        btn.innerHTML = `⚠️ Hata`;
+        console.error("Deploy Hatası Detayı:", err);
+        
         setTimeout(() => { 
             btn.innerHTML = originalHtml; 
+            btn.className = originalClass; // Orijinal class'a dön
             btn.disabled = false; 
-        }, 2000);
+        }, 3000);
     }
     
     if (typeof lucide !== 'undefined') {
