@@ -626,7 +626,7 @@ function updateChatUI(chatId) {
   requestAnimationFrame(() => {
     container.scrollTo({
       top: container.scrollHeight,
-      behavior: 'smooth',
+      behavior: 'auto',
     });
   });
 }
