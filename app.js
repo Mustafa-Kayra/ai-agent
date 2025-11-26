@@ -622,7 +622,7 @@ function updateChatUI(chatId) {
     lucide.createIcons();
   }
 
-  // OPTİMİZASYON: RequestAnimationFrame ile smooth scrolling
+  // OPTİMİZASYON: RequestAnimationFrame ile scrolling
   requestAnimationFrame(() => {
     container.scrollTo({
       top: container.scrollHeight,
