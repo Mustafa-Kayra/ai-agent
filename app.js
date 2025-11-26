@@ -85,7 +85,7 @@ const UI_TRANSLATIONS = {
     custom: 'Özel',
     customPromptPlaceholder: 'Özel konuşma stilinizi yazın...',
     language: 'Dil',
-    addCustomModel: '➕ Siz model ekleyin...',
+    addCustomModel: '➕ Özel model ekle...',
     customModels: '🔧 Özel Modellerim',
     chatTab: 'Sohbet',
     imageGenTab: 'Resim Oluştur',
@@ -93,6 +93,12 @@ const UI_TRANSLATIONS = {
     download: 'İndir',
     uploadFile: 'Dosya Yükle',
     sources: 'Kaynaklar:',
+    modelIdRequired: 'Model ID ve isim gereklidir.',
+    confirmDeleteModel: 'Bu modeli silmek istediğinize emin misiniz?',
+    unsupportedFileFormat:
+      'Desteklenmeyen dosya formatı. JPG, PNG, GIF, HEIC, MP4 veya WEBM kullanın.',
+    enterPrompt: 'Lütfen bir prompt girin.',
+    imageError: 'Resim oluşturma hatası:',
     deploy: 'Canlıya Al (Host)',
     deploying: 'Yayınlanıyor...',
     preparing: 'Hazırlanıyor...',
@@ -138,6 +144,11 @@ const UI_TRANSLATIONS = {
     deploy: 'Deploy (Host)',
     deploying: 'Deploying...',
     preparing: 'Preparing...',
+    modelIdRequired: 'Model ID and name are required.',
+    confirmDeleteModel: 'Are you sure you want to delete this model?',
+    unsupportedFileFormat: 'Unsupported file format. Use JPG, PNG, GIF, HEIC, MP4 or WEBM.',
+    enterPrompt: 'Please enter a prompt.',
+    imageError: 'Image generation error:',
   },
 };
 
@@ -1127,7 +1138,7 @@ function addCustomModel() {
   const name = nameInput.value.trim();
 
   if (!id || !name) {
-    alert('Model ID ve isim gereklidir.');
+    alert(t('modelIdRequired'));
     return;
   }
 
@@ -1141,7 +1152,7 @@ function addCustomModel() {
 }
 
 function deleteCustomModel(index) {
-  if (confirm('Bu modeli silmek istediğinize emin misiniz?')) {
+  if (confirm(t('confirmDeleteModel'))) {
     customModels.splice(index, 1);
     saveCustomModels();
     renderCustomModels();
@@ -1163,7 +1174,7 @@ function handleFileUpload(event) {
   ];
 
   if (!allowedTypes.includes(file.type)) {
-    alert('Desteklenmeyen dosya formatı. JPG, PNG, GIF, HEIC, MP4 veya WEBM kullanın.');
+    alert(t('unsupportedFileFormat'));
     return;
   }
 
@@ -1231,14 +1242,14 @@ async function generateImage() {
 
   const prompt = promptInput.value.trim();
   if (!prompt) {
-    alert('Lütfen bir prompt girin.');
+    alert(t('enterPrompt'));
     return;
   }
 
   const model = modelSelect.value;
   const originalBtnText = generateBtn.innerHTML;
 
-  generateBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Oluşturuluyor...`;
+  generateBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> ${t('generate')}...`;
   generateBtn.disabled = true;
 
   try {
@@ -1279,7 +1290,7 @@ async function generateImage() {
     promptInput.value = '';
   } catch (err) {
     logError(err, 'generateImage');
-    alert(`Resim oluşturma hatası: ${err.message}`);
+    alert(`${t('imageError')} ${err.message}`);
   } finally {
     generateBtn.innerHTML = originalBtnText;
     generateBtn.disabled = false;
