@@ -29,135 +29,8 @@ let customModels = []; // Kullanıcının eklediği özel modeller
 let uploadedFile = null; // Yüklenen dosya (görsel/video)
 let activeTab = 'chat'; // 'chat' veya 'image-gen'
 
-// --- DİL DESTEĞİ (20 DİL) ---
-const LANGUAGES = {
-  tr: { name: 'Türkçe', flag: '🇹🇷', prompt: 'Türkçe' },
-  en: { name: 'English', flag: '🇺🇸', prompt: 'English' },
-  zh: { name: '中文', flag: '🇨🇳', prompt: 'Chinese (Mandarin)' },
-  es: { name: 'Español', flag: '🇪🇸', prompt: 'Spanish' },
-  ar: { name: 'العربية', flag: '🇸🇦', prompt: 'Arabic' },
-  hi: { name: 'हिन्दी', flag: '🇮🇳', prompt: 'Hindi' },
-  pt: { name: 'Português', flag: '🇧🇷', prompt: 'Portuguese' },
-  ru: { name: 'Русский', flag: '🇷🇺', prompt: 'Russian' },
-  ja: { name: '日本語', flag: '🇯🇵', prompt: 'Japanese' },
-  de: { name: 'Deutsch', flag: '🇩🇪', prompt: 'German' },
-  fr: { name: 'Français', flag: '🇫🇷', prompt: 'French' },
-  ko: { name: '한국어', flag: '🇰🇷', prompt: 'Korean' },
-  it: { name: 'Italiano', flag: '🇮🇹', prompt: 'Italian' },
-  vi: { name: 'Tiếng Việt', flag: '🇻🇳', prompt: 'Vietnamese' },
-  fa: { name: 'فارسی', flag: '🇮🇷', prompt: 'Persian' },
-  pl: { name: 'Polski', flag: '🇵🇱', prompt: 'Polish' },
-  uk: { name: 'Українська', flag: '🇺🇦', prompt: 'Ukrainian' },
-  ro: { name: 'Română', flag: '🇷🇴', prompt: 'Romanian' },
-  nl: { name: 'Nederlands', flag: '🇳🇱', prompt: 'Dutch' },
-  th: { name: 'ไทย', flag: '🇹🇭', prompt: 'Thai' },
-};
-
-// Arayüz çevirileri
-const UI_TRANSLATIONS = {
-  tr: {
-    newChat: 'Yeni Sohbet',
-    login: 'Giriş Yap',
-    guest: 'Misafir',
-    processing: 'İşleniyor...',
-    controlPanel: 'Kontrol Paneli',
-    modeSettings: 'Mod ve Motor Ayarları',
-    workMode: 'Çalışma Modu',
-    aiEngine: 'Yapay Zeka Motoru',
-    generalChat: 'Genel Sohbet',
-    generalChatDesc: 'Günlük asistan, hızlı cevaplar.',
-    deepSearch: 'Deep Search',
-    deepSearchDesc: 'Akademik araştırma, kaynaklı.',
-    codingHost: 'Kodlama & Host',
-    codingHostDesc: 'Tek tıkla deploy, temiz kod.',
-    learningExpert: 'Öğrenme Uzmanı',
-    learningExpertDesc: 'Sokratik metodla öğretim.',
-    askSomething: 'Bir şeyler sor...',
-    liveThinking: '⚡ Canlı Düşünme',
-    cloudMemory: '🔒 Bulut Hafıza',
-    autoDeploy: '🚀 Auto-Deploy',
-    conversationStyle: 'Konuşma Stili',
-    normal: 'Normal',
-    genZ: 'Z Kuşağı',
-    millennial: 'Y Kuşağı',
-    academic: 'Akademik',
-    friendly: 'Samimi',
-    custom: 'Özel',
-    customPromptPlaceholder: 'Özel konuşma stilinizi yazın...',
-    language: 'Dil',
-    addCustomModel: '➕ Özel model ekle...',
-    customModels: '🔧 Özel Modellerim',
-    chatTab: 'Sohbet',
-    imageGenTab: 'Resim Oluştur',
-    generate: 'Oluştur',
-    download: 'İndir',
-    uploadFile: 'Dosya Yükle',
-    sources: 'Kaynaklar:',
-    modelIdRequired: 'Model ID ve isim gereklidir.',
-    confirmDeleteModel: 'Bu modeli silmek istediğinize emin misiniz?',
-    unsupportedFileFormat:
-      'Desteklenmeyen dosya formatı. JPG, PNG, GIF, HEIC, MP4 veya WEBM kullanın.',
-    enterPrompt: 'Lütfen bir prompt girin.',
-    imageError: 'Resim oluşturma hatası:',
-    deploy: 'Canlıya Al (Host)',
-    deploying: 'Yayınlanıyor...',
-    preparing: 'Hazırlanıyor...',
-  },
-  en: {
-    newChat: 'New Chat',
-    login: 'Sign In',
-    guest: 'Guest',
-    processing: 'Processing...',
-    controlPanel: 'Control Panel',
-    modeSettings: 'Mode and Engine Settings',
-    workMode: 'Work Mode',
-    aiEngine: 'AI Engine',
-    generalChat: 'General Chat',
-    generalChatDesc: 'Daily assistant, quick answers.',
-    deepSearch: 'Deep Search',
-    deepSearchDesc: 'Academic research, sourced.',
-    codingHost: 'Coding & Host',
-    codingHostDesc: 'One-click deploy, clean code.',
-    learningExpert: 'Learning Expert',
-    learningExpertDesc: 'Socratic method teaching.',
-    askSomething: 'Ask something...',
-    liveThinking: '⚡ Live Thinking',
-    cloudMemory: '🔒 Cloud Memory',
-    autoDeploy: '🚀 Auto-Deploy',
-    conversationStyle: 'Conversation Style',
-    normal: 'Normal',
-    genZ: 'Gen Z',
-    millennial: 'Millennial',
-    academic: 'Academic',
-    friendly: 'Friendly',
-    custom: 'Custom',
-    customPromptPlaceholder: 'Write your custom conversation style...',
-    language: 'Language',
-    addCustomModel: '➕ Add your model...',
-    customModels: '🔧 My Custom Models',
-    chatTab: 'Chat',
-    imageGenTab: 'Create Image',
-    generate: 'Generate',
-    download: 'Download',
-    uploadFile: 'Upload File',
-    sources: 'Sources:',
-    deploy: 'Deploy (Host)',
-    deploying: 'Deploying...',
-    preparing: 'Preparing...',
-    modelIdRequired: 'Model ID and name are required.',
-    confirmDeleteModel: 'Are you sure you want to delete this model?',
-    unsupportedFileFormat: 'Unsupported file format. Use JPG, PNG, GIF, HEIC, MP4 or WEBM.',
-    enterPrompt: 'Please enter a prompt.',
-    imageError: 'Image generation error:',
-  },
-};
-
-// Eksik diller için varsayılan olarak İngilizce kullan
-Object.keys(LANGUAGES).forEach((lang) => {
-  if (!UI_TRANSLATIONS[lang]) {
-    UI_TRANSLATIONS[lang] = UI_TRANSLATIONS['en'];
-  }
-});
+// --- DİL DESTEĞİ ---
+// LANGUAGES ve UI_TRANSLATIONS artık languages.js dosyasında tanımlıdır
 
 // Çeviri yardımcı fonksiyonu
 function t(key) {
@@ -440,9 +313,13 @@ async function handleSendClick() {
     }
 
     // Dil ve stil prompt'larını oluştur
-    const langPrompt = LANGUAGES[currentLanguage]
-      ? `Lütfen ${LANGUAGES[currentLanguage].prompt} dilinde cevap ver.`
-      : '';
+    // Dil promptu hedef dile özgü olmalı, böylece model doğru dili kullanır
+    let langPrompt = '';
+    if (LANGUAGES[currentLanguage]) {
+      const langName = LANGUAGES[currentLanguage].prompt;
+      // Prompt'u İngilizce olarak yaz, model daha iyi anlar
+      langPrompt = `IMPORTANT: You MUST respond entirely in ${langName}. Do not use any other language.`;
+    }
 
     const stylePrompt =
       currentStyle === 'custom'
@@ -672,7 +549,7 @@ function startNewChat() {
 
   const newChat = {
     id: id,
-    title: 'Yeni Sohbet',
+    title: t('newChat'),
     messages: [],
     mode: initialMode,
     timestamp: Date.now(),
@@ -706,29 +583,86 @@ function renderHistoryList() {
 
   chats.forEach((chat) => {
     const isActive = chat.id === activeChatId;
+    const chatItem = document.createElement('div');
+    chatItem.className = 'relative group mb-1';
+
     const btn = document.createElement('button');
     btn.onclick = () => loadChatToUI(chat.id);
 
     const processingBadge = chat.isProcessing
-      ? `<div class="absolute right-3 top-3 w-2 h-2 bg-blue-500 rounded-full animate-ping"></div><div class="absolute right-3 top-3 w-2 h-2 bg-blue-500 rounded-full"></div>`
+      ? `<div class="absolute right-10 top-3 w-2 h-2 bg-blue-500 rounded-full animate-ping"></div><div class="absolute right-10 top-3 w-2 h-2 bg-blue-500 rounded-full"></div>`
       : '';
 
-    btn.className = `w-full text-left p-3 rounded-xl text-sm mb-1 flex items-center gap-3 relative transition-all group border border-transparent
+    btn.className = `w-full text-left p-3 rounded-xl text-sm flex items-center gap-3 relative transition-all border border-transparent
             ${isActive ? 'bg-[#1e2130] border-[#2f3345] text-white shadow-md' : 'text-gray-400 hover:bg-[#151722] hover:text-gray-200'}`;
 
     btn.innerHTML = `
-            <i data-lucide="message-circle" class="w-4 h-4 opacity-60"></i>
+            <i data-lucide="message-circle" class="w-4 h-4 opacity-60 flex-shrink-0"></i>
             <div class="flex-1 min-w-0">
                 <div class="truncate font-medium text-[13px]">${chat.title}</div>
-                <div class="text-[10px] opacity-50 truncate">${chat.isProcessing ? chat.tempStatus || 'Çalışıyor...' : new Date(chat.timestamp).toLocaleDateString()}</div>
+                <div class="text-[10px] opacity-50 truncate">${chat.isProcessing ? chat.tempStatus || t('processing') : new Date(chat.timestamp).toLocaleDateString()}</div>
             </div>
             ${processingBadge}
         `;
-    list.appendChild(btn);
+
+    // Sohbet düzenleme menüsü (hover'da görünür)
+    const menuContainer = document.createElement('div');
+    menuContainer.className =
+      'absolute right-2 top-1/2 -translate-y-1/2 hidden group-hover:flex items-center gap-1 bg-[#1e2130] rounded-lg p-1 border border-[#2f3345] z-10';
+    menuContainer.innerHTML = `
+            <button onclick="event.stopPropagation(); renameChat('${chat.id}')" class="p-1.5 hover:bg-[#3b52d4]/20 rounded text-gray-400 hover:text-blue-400 transition-colors" title="${t('renameChat')}">
+                <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
+            </button>
+            <button onclick="event.stopPropagation(); deleteChat('${chat.id}')" class="p-1.5 hover:bg-red-500/20 rounded text-gray-400 hover:text-red-400 transition-colors" title="${t('deleteChat')}">
+                <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+            </button>
+        `;
+
+    chatItem.appendChild(btn);
+    chatItem.appendChild(menuContainer);
+    list.appendChild(chatItem);
   });
 
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
+  }
+}
+
+// Sohbeti yeniden adlandır
+function renameChat(chatId) {
+  const chat = chats.find((c) => c.id === chatId);
+  if (!chat) return;
+
+  const newName = prompt(t('enterChatName'), chat.title);
+  if (newName && newName.trim()) {
+    chat.title = newName.trim();
+    saveChats();
+    renderHistoryList();
+    if (chatId === activeChatId) {
+      document.getElementById('chat-header-title').innerText = chat.title;
+    }
+  }
+}
+
+// Sohbeti sil
+function deleteChat(chatId) {
+  if (!confirm(t('confirmDeleteChat'))) return;
+
+  const index = chats.findIndex((c) => c.id === chatId);
+  if (index === -1) return;
+
+  chats.splice(index, 1);
+  saveChats();
+
+  // Silinen sohbet aktifse, başka birine geç
+  if (chatId === activeChatId) {
+    if (chats.length > 0) {
+      loadChatToUI(chats[0].id);
+    } else {
+      startNewChat();
+    }
+  } else {
+    renderHistoryList();
   }
 }
 
@@ -1062,10 +996,12 @@ function loadCustomModels() {
     const saved = localStorage.getItem('ai_workspace_custom_models');
     if (saved) {
       customModels = JSON.parse(saved);
-      renderCustomModels();
     }
   } catch (e) {
     logError(e, 'loadCustomModels');
+  } finally {
+    // Her zaman renderCustomModels çağır (boş olsa bile "Model Ekle" seçeneği için)
+    renderCustomModels();
   }
 }
 
@@ -1233,7 +1169,7 @@ function clearUploadedFile() {
   }
 }
 
-// --- RESİM OLUŞTURMA (NANO BANANA) ---
+// --- RESİM OLUŞTURMA ---
 async function generateImage() {
   const promptInput = document.getElementById('image-prompt');
   const modelSelect = document.getElementById('image-model-selector');
@@ -1249,32 +1185,56 @@ async function generateImage() {
   const model = modelSelect.value;
   const originalBtnText = generateBtn.innerHTML;
 
-  generateBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> ${t('generate')}...`;
+  generateBtn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> ${t('generating')}`;
   generateBtn.disabled = true;
 
   try {
-    const response = await puter.ai.txt2img(prompt, { model: model });
+    // Puter API kontrolü
+    if (typeof puter === 'undefined' || !puter.ai) {
+      throw new Error(t('puterApiUnavailable'));
+    }
 
-    // Yanıtı işle
     let imageUrl = '';
-    if (typeof response === 'string') {
-      imageUrl = response;
-    } else if (response?.url) {
-      imageUrl = response.url;
-    } else if (response?.image) {
-      imageUrl = response.image;
-    } else if (response?.data) {
-      imageUrl = `data:image/png;base64,${response.data}`;
+
+    // puter.ai.txt2img API'sini kullan
+    if (puter.ai.txt2img) {
+      const response = await puter.ai.txt2img(prompt, { model: model });
+
+      // Yanıt türüne göre işle
+      if (response instanceof Blob) {
+        // Blob yanıtı - URL oluştur
+        imageUrl = URL.createObjectURL(response);
+      } else if (typeof response === 'string') {
+        // String yanıt (URL veya base64)
+        if (response.startsWith('data:') || response.startsWith('http')) {
+          imageUrl = response;
+        } else {
+          // Base64 data
+          imageUrl = `data:image/png;base64,${response}`;
+        }
+      } else if (response?.src) {
+        // HTMLImageElement - src özelliğini al
+        imageUrl = response.src;
+      } else if (response?.url) {
+        imageUrl = response.url;
+      } else if (response?.image) {
+        imageUrl = response.image;
+      } else if (response?.data) {
+        imageUrl = `data:image/png;base64,${response.data}`;
+      }
+    } else {
+      throw new Error('txt2img API not supported.');
     }
 
     if (imageUrl) {
+      const imageLoadErrorMsg = t('imageLoadError');
       const imageCard = document.createElement('div');
       imageCard.className =
         'relative group rounded-xl overflow-hidden border border-[#2f3345] bg-[#1e2130]';
       imageCard.innerHTML = `
-                <img src="${imageUrl}" alt="${prompt}" class="w-full aspect-square object-cover">
+                <img src="${imageUrl}" alt="${prompt}" class="w-full aspect-square object-cover" onerror="this.parentElement.innerHTML='<div class=\\'p-4 text-red-400 text-center\\'>${imageLoadErrorMsg}</div>'">
                 <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                    <a href="${imageUrl}" download="nano-banana-${Date.now()}.png" class="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors">
+                    <a href="${imageUrl}" download="generated-${Date.now()}.png" class="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors">
                         <i data-lucide="download" class="w-5 h-5 text-white"></i>
                     </a>
                 </div>
@@ -1285,9 +1245,11 @@ async function generateImage() {
       if (typeof lucide !== 'undefined') {
         lucide.createIcons();
       }
-    }
 
-    promptInput.value = '';
+      promptInput.value = '';
+    } else {
+      throw new Error(t('imageGenError'));
+    }
   } catch (err) {
     logError(err, 'generateImage');
     alert(`${t('imageError')} ${err.message}`);
