@@ -997,11 +997,11 @@ function loadCustomModels() {
     if (saved) {
       customModels = JSON.parse(saved);
     }
-    // Her zaman renderCustomModels çağır (boş olsa bile "Model Ekle" seçeneği için)
-    renderCustomModels();
   } catch (e) {
     logError(e, 'loadCustomModels');
-    renderCustomModels(); // Hata durumunda da "Model Ekle" seçeneğini ekle
+  } finally {
+    // Her zaman renderCustomModels çağır (boş olsa bile "Model Ekle" seçeneği için)
+    renderCustomModels();
   }
 }
 
@@ -1191,7 +1191,7 @@ async function generateImage() {
   try {
     // Puter API kontrolü
     if (typeof puter === 'undefined' || !puter.ai) {
-      throw new Error('Puter API mevcut değil. Lütfen giriş yapın.');
+      throw new Error(t('puterApiUnavailable'));
     }
 
     let imageUrl = '';
@@ -1223,15 +1223,16 @@ async function generateImage() {
         imageUrl = `data:image/png;base64,${response.data}`;
       }
     } else {
-      throw new Error('txt2img API desteklenmiyor.');
+      throw new Error('txt2img API not supported.');
     }
 
     if (imageUrl) {
+      const imageLoadErrorMsg = t('imageLoadError');
       const imageCard = document.createElement('div');
       imageCard.className =
         'relative group rounded-xl overflow-hidden border border-[#2f3345] bg-[#1e2130]';
       imageCard.innerHTML = `
-                <img src="${imageUrl}" alt="${prompt}" class="w-full aspect-square object-cover" onerror="this.parentElement.innerHTML='<div class=\\'p-4 text-red-400 text-center\\'>Resim yüklenemedi</div>'">
+                <img src="${imageUrl}" alt="${prompt}" class="w-full aspect-square object-cover" onerror="this.parentElement.innerHTML='<div class=\\'p-4 text-red-400 text-center\\'>${imageLoadErrorMsg}</div>'">
                 <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                     <a href="${imageUrl}" download="generated-${Date.now()}.png" class="p-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors">
                         <i data-lucide="download" class="w-5 h-5 text-white"></i>

@@ -1,6 +1,7 @@
 /**
  * Puter AI 2025 - Dil Desteği
- * 20 dil için çeviriler ve dil yapılandırmaları
+ * 20 dil için dil yapılandırmaları, 12 dil için tam UI çevirileri
+ * Eksik diller için İngilizce varsayılan olarak kullanılır
  */
 
 // Desteklenen diller ve özellikleri
@@ -83,6 +84,8 @@ const UI_TR = {
   imageGenError: 'Resim oluşturulamadı. Lütfen tekrar deneyin.',
   savedToCloud: 'Buluta kaydedildi',
   savingToCloud: 'Buluta kaydediliyor...',
+  puterApiUnavailable: 'Puter API mevcut değil. Lütfen giriş yapın.',
+  imageLoadError: 'Resim yüklenemedi',
 };
 
 // Arayüz çevirileri - İngilizce
@@ -140,6 +143,8 @@ const UI_EN = {
   imageGenError: 'Could not generate image. Please try again.',
   savedToCloud: 'Saved to cloud',
   savingToCloud: 'Saving to cloud...',
+  puterApiUnavailable: 'Puter API is not available. Please sign in.',
+  imageLoadError: 'Image could not be loaded',
 };
 
 // Arayüz çevirileri - Çince
@@ -197,6 +202,8 @@ const UI_ZH = {
   imageGenError: '无法生成图片，请重试。',
   savedToCloud: '已保存到云端',
   savingToCloud: '正在保存到云端...',
+  puterApiUnavailable: 'Puter API不可用。请登录。',
+  imageLoadError: '图片加载失败',
 };
 
 // Arayüz çevirileri - İspanyolca
@@ -254,6 +261,8 @@ const UI_ES = {
   imageGenError: 'No se pudo generar la imagen. Por favor, inténtalo de nuevo.',
   savedToCloud: 'Guardado en la nube',
   savingToCloud: 'Guardando en la nube...',
+  puterApiUnavailable: 'La API de Puter no está disponible. Por favor, inicie sesión.',
+  imageLoadError: 'No se pudo cargar la imagen',
 };
 
 // Arayüz çevirileri - Arapça
@@ -311,6 +320,8 @@ const UI_AR = {
   imageGenError: 'تعذر إنشاء الصورة. يرجى المحاولة مرة أخرى.',
   savedToCloud: 'تم الحفظ في السحابة',
   savingToCloud: 'جاري الحفظ في السحابة...',
+  puterApiUnavailable: 'واجهة برمجة التطبيقات Puter غير متوفرة. يرجى تسجيل الدخول.',
+  imageLoadError: 'تعذر تحميل الصورة',
 };
 
 // Arayüz çevirileri - Hintçe
@@ -368,6 +379,8 @@ const UI_HI = {
   imageGenError: 'छवि नहीं बनाई जा सकी। कृपया पुनः प्रयास करें।',
   savedToCloud: 'क्लाउड में सहेजा गया',
   savingToCloud: 'क्लाउड में सहेजा जा रहा है...',
+  puterApiUnavailable: 'Puter API उपलब्ध नहीं है। कृपया साइन इन करें।',
+  imageLoadError: 'छवि लोड नहीं हो सकी',
 };
 
 // Arayüz çevirileri - Portekizce
@@ -425,6 +438,8 @@ const UI_PT = {
   imageGenError: 'Não foi possível gerar a imagem. Por favor, tente novamente.',
   savedToCloud: 'Salvo na nuvem',
   savingToCloud: 'Salvando na nuvem...',
+  puterApiUnavailable: 'A API do Puter não está disponível. Por favor, faça login.',
+  imageLoadError: 'Não foi possível carregar a imagem',
 };
 
 // Arayüz çevirileri - Rusça
@@ -483,6 +498,8 @@ const UI_RU = {
   imageGenError: 'Не удалось создать изображение. Пожалуйста, попробуйте снова.',
   savedToCloud: 'Сохранено в облаке',
   savingToCloud: 'Сохранение в облаке...',
+  puterApiUnavailable: 'Puter API недоступен. Пожалуйста, войдите в систему.',
+  imageLoadError: 'Не удалось загрузить изображение',
 };
 
 // Arayüz çevirileri - Japonca
@@ -541,6 +558,8 @@ const UI_JA = {
   imageGenError: '画像を生成できませんでした。もう一度お試しください。',
   savedToCloud: 'クラウドに保存しました',
   savingToCloud: 'クラウドに保存中...',
+  puterApiUnavailable: 'Puter APIが利用できません。サインインしてください。',
+  imageLoadError: '画像を読み込めませんでした',
 };
 
 // Arayüz çevirileri - Almanca
@@ -599,6 +618,8 @@ const UI_DE = {
   imageGenError: 'Bild konnte nicht generiert werden. Bitte versuchen Sie es erneut.',
   savedToCloud: 'In der Cloud gespeichert',
   savingToCloud: 'Wird in der Cloud gespeichert...',
+  puterApiUnavailable: 'Die Puter API ist nicht verfügbar. Bitte melden Sie sich an.',
+  imageLoadError: 'Bild konnte nicht geladen werden',
 };
 
 // Arayüz çevirileri - Fransızca
@@ -657,6 +678,8 @@ const UI_FR = {
   imageGenError: "Impossible de générer l'image. Veuillez réessayer.",
   savedToCloud: 'Enregistré dans le cloud',
   savingToCloud: 'Enregistrement dans le cloud...',
+  puterApiUnavailable: "L'API Puter n'est pas disponible. Veuillez vous connecter.",
+  imageLoadError: "L'image n'a pas pu être chargée",
 };
 
 // Arayüz çevirileri - Korece
@@ -715,6 +738,8 @@ const UI_KO = {
   imageGenError: '이미지를 생성할 수 없습니다. 다시 시도해 주세요.',
   savedToCloud: '클라우드에 저장됨',
   savingToCloud: '클라우드에 저장 중...',
+  puterApiUnavailable: 'Puter API를 사용할 수 없습니다. 로그인해 주세요.',
+  imageLoadError: '이미지를 불러올 수 없습니다',
 };
 
 // Tüm çevirileri içeren nesne
