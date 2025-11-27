@@ -790,6 +790,17 @@ const UI_FR = {
   savingToCloud: 'Enregistrement dans le cloud...',
   puterApiUnavailable: "L'API Puter n'est pas disponible. Veuillez vous connecter.",
   imageLoadError: "L'image n'a pas pu être chargée",
+  // Nouvelles traductions - Comparaison de modèles et régénération
+  compare: 'Comparer',
+  tryAnotherModel: 'Essayer un autre modèle :',
+  regenerate: 'Régénérer',
+  regenerating: 'Régénération...',
+  loading: 'Chargement...',
+  error: 'Erreur',
+  noImages: 'Aucune image créée pour le moment',
+  confirmDeleteImage: 'Êtes-vous sûr de vouloir supprimer cette image ?',
+  compareResult: 'Le résultat de la comparaison apparaîtra ici',
+  askBothModels: 'Posez la même question aux deux modèles...',
 };
 
 // Arayüz çevirileri - Korece
@@ -850,17 +861,17 @@ const UI_KO = {
   savingToCloud: '클라우드에 저장 중...',
   puterApiUnavailable: 'Puter API를 사용할 수 없습니다. 로그인해 주세요.',
   imageLoadError: '이미지를 불러올 수 없습니다',
-  // Nouvelles traductions - Comparaison de modèles et régénération
-  compare: 'Comparer',
-  tryAnotherModel: 'Essayer un autre modèle :',
-  regenerate: 'Régénérer',
-  regenerating: 'Régénération...',
-  loading: 'Chargement...',
-  error: 'Erreur',
-  noImages: 'Aucune image créée pour le moment',
-  confirmDeleteImage: 'Êtes-vous sûr de vouloir supprimer cette image ?',
-  compareResult: 'Le résultat de la comparaison apparaîtra ici',
-  askBothModels: 'Posez la même question aux deux modèles...',
+  // 새 번역 - 모델 비교 및 재생성
+  compare: '비교',
+  tryAnotherModel: '다른 모델 시도:',
+  regenerate: '재생성',
+  regenerating: '재생성 중...',
+  loading: '로딩 중...',
+  error: '오류',
+  noImages: '아직 생성된 이미지가 없습니다',
+  confirmDeleteImage: '이 이미지를 삭제하시겠습니까?',
+  compareResult: '비교 결과가 여기에 표시됩니다',
+  askBothModels: '두 모델에 같은 질문하기...',
 };
 
 // Arayüz çevirileri - İtalyanca
@@ -920,6 +931,17 @@ const UI_IT = {
   savingToCloud: 'Salvataggio nel cloud...',
   puterApiUnavailable: 'API Puter non disponibile. Effettua il login.',
   imageLoadError: "Impossibile caricare l'immagine",
+  // Nuove traduzioni - Confronto modelli e rigenerazione
+  compare: 'Confronta',
+  tryAnotherModel: 'Prova un altro modello:',
+  regenerate: 'Rigenera',
+  regenerating: 'Rigenerazione...',
+  loading: 'Caricamento...',
+  error: 'Errore',
+  noImages: 'Nessuna immagine creata',
+  confirmDeleteImage: 'Sei sicuro di voler eliminare questa immagine?',
+  compareResult: 'Il risultato del confronto apparirà qui',
+  askBothModels: 'Fai la stessa domanda a entrambi i modelli...',
 };
 
 // Arayüz çevirileri - Vietnamca
@@ -980,17 +1002,17 @@ const UI_VI = {
   savingToCloud: 'Đang lưu vào đám mây...',
   puterApiUnavailable: 'API Puter không khả dụng. Vui lòng đăng nhập.',
   imageLoadError: 'Không thể tải hình ảnh',
-  // 새 번역 - 모델 비교 및 재생성
-  compare: '비교',
-  tryAnotherModel: '다른 모델 시도:',
-  regenerate: '재생성',
-  regenerating: '재생성 중...',
-  loading: '로딩 중...',
-  error: '오류',
-  noImages: '아직 생성된 이미지가 없습니다',
-  confirmDeleteImage: '이 이미지를 삭제하시겠습니까?',
-  compareResult: '비교 결과가 여기에 표시됩니다',
-  askBothModels: '두 모델에 같은 질문하기...',
+  // Bản dịch mới - So sánh mô hình và tái tạo
+  compare: 'So sánh',
+  tryAnotherModel: 'Thử mô hình khác:',
+  regenerate: 'Tái tạo',
+  regenerating: 'Đang tái tạo...',
+  loading: 'Đang tải...',
+  error: 'Lỗi',
+  noImages: 'Chưa có hình ảnh nào được tạo',
+  confirmDeleteImage: 'Bạn có chắc muốn xóa hình ảnh này?',
+  compareResult: 'Kết quả so sánh sẽ xuất hiện ở đây',
+  askBothModels: 'Hỏi cùng một câu hỏi cho cả hai mô hình...',
 };
 
 // Arayüz çevirileri - Farsça
@@ -1051,17 +1073,17 @@ const UI_FA = {
   savingToCloud: 'در حال ذخیره در ابر...',
   puterApiUnavailable: 'API Puter در دسترس نیست. لطفاً وارد شوید.',
   imageLoadError: 'نمی‌توان تصویر را بارگذاری کرد',
-  // Nuove traduzioni - Confronto modelli e rigenerazione
-  compare: 'Confronta',
-  tryAnotherModel: 'Prova un altro modello:',
-  regenerate: 'Rigenera',
-  regenerating: 'Rigenerazione...',
-  loading: 'Caricamento...',
-  error: 'Errore',
-  noImages: 'Nessuna immagine creata',
-  confirmDeleteImage: 'Sei sicuro di voler eliminare questa immagine?',
-  compareResult: 'Il risultato del confronto apparirà qui',
-  askBothModels: 'Fai la stessa domanda a entrambi i modelli...',
+  // ترجمه‌های جدید - مقایسه مدل و بازسازی
+  compare: 'مقایسه',
+  tryAnotherModel: 'مدل دیگر را امتحان کنید:',
+  regenerate: 'بازسازی',
+  regenerating: 'در حال بازسازی...',
+  loading: 'در حال بارگذاری...',
+  error: 'خطا',
+  noImages: 'هنوز تصویری ایجاد نشده',
+  confirmDeleteImage: 'آیا مطمئن هستید که می‌خواهید این تصویر را حذف کنید?',
+  compareResult: 'نتیجه مقایسه اینجا نمایش داده می‌شود',
+  askBothModels: 'از هر دو مدل همان سوال را بپرسید...',
 };
 
 // Arayüz çevirileri - Lehçe
@@ -1121,17 +1143,17 @@ const UI_PL = {
   savingToCloud: 'Zapisywanie w chmurze...',
   puterApiUnavailable: 'API Puter nie jest dostępne. Proszę się zalogować.',
   imageLoadError: 'Nie można załadować obrazu',
-  // Bản dịch mới - So sánh mô hình và tái tạo
-  compare: 'So sánh',
-  tryAnotherModel: 'Thử mô hình khác:',
-  regenerate: 'Tái tạo',
-  regenerating: 'Đang tái tạo...',
-  loading: 'Đang tải...',
-  error: 'Lỗi',
-  noImages: 'Chưa có hình ảnh nào được tạo',
-  confirmDeleteImage: 'Bạn có chắc muốn xóa hình ảnh này?',
-  compareResult: 'Kết quả so sánh sẽ xuất hiện ở đây',
-  askBothModels: 'Hỏi cùng một câu hỏi cho cả hai mô hình...',
+  // Nowe tłumaczenia - Porównanie modeli i regeneracja
+  compare: 'Porównaj',
+  tryAnotherModel: 'Wypróbuj inny model:',
+  regenerate: 'Regeneruj',
+  regenerating: 'Regenerowanie...',
+  loading: 'Ładowanie...',
+  error: 'Błąd',
+  noImages: 'Nie utworzono jeszcze obrazów',
+  confirmDeleteImage: 'Czy na pewno chcesz usunąć ten obraz?',
+  compareResult: 'Wynik porównania pojawi się tutaj',
+  askBothModels: 'Zadaj to samo pytanie obu modelom...',
 };
 
 // Arayüz çevirileri - Ukraynaca
@@ -1192,17 +1214,17 @@ const UI_UK = {
   savingToCloud: 'Збереження в хмарі...',
   puterApiUnavailable: 'API Puter недоступний. Будь ласка, увійдіть.',
   imageLoadError: 'Не вдалося завантажити зображення',
-  // ترجمه‌های جدید - مقایسه مدل و بازسازی
-  compare: 'مقایسه',
-  tryAnotherModel: 'مدل دیگر را امتحان کنید:',
-  regenerate: 'بازسازی',
-  regenerating: 'در حال بازسازی...',
-  loading: 'در حال بارگذاری...',
-  error: 'خطا',
-  noImages: 'هنوز تصویری ایجاد نشده',
-  confirmDeleteImage: 'آیا مطمئن هستید که می‌خواهید این تصویر را حذف کنید؟',
-  compareResult: 'نتیجه مقایسه اینجا نمایش داده می‌شود',
-  askBothModels: 'از هر دو مدل همان سوال را بپرسید...',
+  // Нові переклади - Порівняння моделей та повторна генерація
+  compare: 'Порівняти',
+  tryAnotherModel: 'Спробувати іншу модель:',
+  regenerate: 'Перегенерувати',
+  regenerating: 'Перегенерація...',
+  loading: 'Завантаження...',
+  error: 'Помилка',
+  noImages: 'Зображення ще не створено',
+  confirmDeleteImage: 'Ви впевнені, що хочете видалити це зображення?',
+  compareResult: "Результат порівняння з'явиться тут",
+  askBothModels: 'Задайте те саме питання обом моделям...',
 };
 
 // Arayüz çevirileri - Romence
@@ -1263,17 +1285,17 @@ const UI_RO = {
   savingToCloud: 'Se salvează în cloud...',
   puterApiUnavailable: 'API-ul Puter nu este disponibil. Vă rugăm să vă autentificați.',
   imageLoadError: 'Nu s-a putut încărca imaginea',
-  // Nowe tłumaczenia - Porównanie modeli i regeneracja
-  compare: 'Porównaj',
-  tryAnotherModel: 'Wypróbuj inny model:',
-  regenerate: 'Regeneruj',
-  regenerating: 'Regenerowanie...',
-  loading: 'Ładowanie...',
-  error: 'Błąd',
-  noImages: 'Nie utworzono jeszcze obrazów',
-  confirmDeleteImage: 'Czy na pewno chcesz usunąć ten obraz?',
-  compareResult: 'Wynik porównania pojawi się tutaj',
-  askBothModels: 'Zadaj to samo pytanie obu modelom...',
+  // Traduceri noi - Comparație modele și regenerare
+  compare: 'Compară',
+  tryAnotherModel: 'Încearcă alt model:',
+  regenerate: 'Regenerează',
+  regenerating: 'Se regenerează...',
+  loading: 'Se încarcă...',
+  error: 'Eroare',
+  noImages: 'Nu au fost create imagini încă',
+  confirmDeleteImage: 'Sigur doriți să ștergeți această imagine?',
+  compareResult: 'Rezultatul comparației va apărea aici',
+  askBothModels: 'Pune aceeași întrebare la ambele modele...',
 };
 
 // Arayüz çevirileri - Hollandaca
@@ -1334,17 +1356,17 @@ const UI_NL = {
   savingToCloud: 'Opslaan in de cloud...',
   puterApiUnavailable: 'Puter API is niet beschikbaar. Log in.',
   imageLoadError: 'Kan afbeelding niet laden',
-  // Нові переклади - Порівняння моделей та повторна генерація
-  compare: 'Порівняти',
-  tryAnotherModel: 'Спробувати іншу модель:',
-  regenerate: 'Перегенерувати',
-  regenerating: 'Перегенерація...',
-  loading: 'Завантаження...',
-  error: 'Помилка',
-  noImages: 'Зображення ще не створено',
-  confirmDeleteImage: 'Ви впевнені, що хочете видалити це зображення?',
-  compareResult: "Результат порівняння з'явиться тут",
-  askBothModels: 'Задайте те саме питання обом моделям...',
+  // Nieuwe vertalingen - Modelvergelijking en regeneratie
+  compare: 'Vergelijken',
+  tryAnotherModel: 'Probeer ander model:',
+  regenerate: 'Regenereren',
+  regenerating: 'Bezig met regenereren...',
+  loading: 'Laden...',
+  error: 'Fout',
+  noImages: 'Nog geen afbeeldingen gemaakt',
+  confirmDeleteImage: 'Weet je zeker dat je deze afbeelding wilt verwijderen?',
+  compareResult: 'Het vergelijkingsresultaat verschijnt hier',
+  askBothModels: 'Stel dezelfde vraag aan beide modellen...',
 };
 
 // Arayüz çevirileri - Tayvanca
@@ -1404,17 +1426,17 @@ const UI_TH = {
   savingToCloud: 'กำลังบันทึกในคลาวด์...',
   puterApiUnavailable: 'Puter API ไม่พร้อมใช้งาน กรุณาเข้าสู่ระบบ',
   imageLoadError: 'ไม่สามารถโหลดภาพได้',
-  // Traduceri noi - Comparație modele și regenerare
-  compare: 'Compară',
-  tryAnotherModel: 'Încearcă alt model:',
-  regenerate: 'Regenerează',
-  regenerating: 'Se regenerează...',
-  loading: 'Se încarcă...',
-  error: 'Eroare',
-  noImages: 'Nu au fost create imagini încă',
-  confirmDeleteImage: 'Sigur doriți să ștergeți această imagine?',
-  compareResult: 'Rezultatul comparației va apărea aici',
-  askBothModels: 'Pune aceeași întrebare la ambele modele...',
+  // คำแปลใหม่ - เปรียบเทียบโมเดลและสร้างใหม่
+  compare: 'เปรียบเทียบ',
+  tryAnotherModel: 'ลองโมเดลอื่น:',
+  regenerate: 'สร้างใหม่',
+  regenerating: 'กำลังสร้างใหม่...',
+  loading: 'กำลังโหลด...',
+  error: 'ข้อผิดพลาด',
+  noImages: 'ยังไม่มีภาพที่สร้าง',
+  confirmDeleteImage: 'คุณแน่ใจหรือไม่ว่าต้องการลบภาพนี้?',
+  compareResult: 'ผลการเปรียบเทียบจะแสดงที่นี่',
+  askBothModels: 'ถามคำถามเดียวกันกับทั้งสองโมเดล...',
 };
 
 // Tüm çevirileri içeren nesne

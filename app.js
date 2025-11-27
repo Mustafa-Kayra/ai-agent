@@ -788,11 +788,11 @@ async function handleAuth() {
 }
 
 async function saveChats() {
-  await Storage.save('chats_pro_v1.json', chats);
+  await Storage.save(DB_KEYS.CHATS, chats);
 }
 
 async function loadChats() {
-  const data = await Storage.load('chats_pro_v1.json');
+  const data = await Storage.load(DB_KEYS.CHATS);
   if (data) {
     chats = data;
     renderHistoryList();
