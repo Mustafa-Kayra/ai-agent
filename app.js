@@ -255,22 +255,9 @@ function initApp() {
 
 async function initUser() {
   try {
-    if (typeof puter !== 'undefined') {
-      const user = await puter.auth.getUser().catch(() => null);
-      if (user) {
-        isUserSignedIn = true;
-        document.getElementById('username').innerText = user.username;
-        document.getElementById('user-avatar').innerText = user.username.charAt(0).toUpperCase();
-
-        // Auth butonunu gizle
-        const authBtnParent = document.querySelector('#auth-btn-text')?.parentElement;
-        if (authBtnParent) {
-          authBtnParent.style.display = 'none';
-        }
-
-        await loadChats();
-      }
-    }
+    // Demo mode - skip Puter auth completely
+    // User will click "Sign in" button to activate demo mode
+    await loadChats();
   } catch (e) {
     logError(e, 'initUser');
   }
