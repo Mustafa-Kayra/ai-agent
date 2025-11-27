@@ -236,7 +236,8 @@ const Storage = {
           return data;
         }
       } catch (e) {
-        // Dosya yoksa veya hata varsa null döndür
+        // Dosya yoksa veya hata varsa null döndür - beklenen durum
+        console.debug('Puter.fs dosya okuma hatası (beklenen olabilir):', e.message);
       }
     }
     return null;
@@ -248,7 +249,8 @@ const Storage = {
       try {
         await puter.fs.delete(key + '.json');
       } catch (e) {
-        // Silme hatası yoksay
+        // Silme hatası yoksay - dosya zaten silinmiş olabilir
+        console.debug('Puter.fs dosya silme hatası (beklenen olabilir):', e.message);
       }
     }
   },
@@ -474,11 +476,19 @@ Language: ${langName}`;
         } catch (fallbackError) {
           // gpt-4o da başarısız olduysa claude-sonnet-4 dene
           console.warn('gpt-4o başarısız, claude-sonnet-4 deneniyor...');
-          if (isVisionRequest && visionMessages) {
-            response = await puter.ai.chat(visionMessages, { model: 'claude-sonnet-4' });
-            clearUploadedFile();
-          } else {
-            response = await puter.ai.chat(fullPrompt, { model: 'claude-sonnet-4' });
+          try {
+            if (isVisionRequest && visionMessages) {
+              response = await puter.ai.chat(visionMessages, { model: 'claude-sonnet-4' });
+              clearUploadedFile();
+            } else {
+              response = await puter.ai.chat(fullPrompt, { model: 'claude-sonnet-4' });
+            }
+          } catch (finalError) {
+            // Tüm modeller başarısız olduysa kullanıcıya bilgi ver
+            console.error('Tüm fallback modeller başarısız:', finalError);
+            throw new Error(
+              'AI servisi şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin veya başka bir model seçin.'
+            );
           }
         }
       } else {
