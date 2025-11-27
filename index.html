@@ -314,6 +314,13 @@
             >
               <i data-lucide="play" class="w-5 h-5"></i>
             </button>
+            <button
+              onclick="clearCompareHistory()"
+              class="bg-[#2b2e40] hover:bg-[#3b3e50] text-gray-400 hover:text-white px-3 rounded-xl flex items-center justify-center"
+              title="Geçmişi Temizle"
+            >
+              <i data-lucide="trash-2" class="w-4 h-4"></i>
+            </button>
           </div>
         </div>
       </div>
@@ -509,16 +516,14 @@
             >
               <optgroup label="🔥 2025 Flagships (En İyiler)">
                 <option value="openrouter:openai/gpt-5.1">GPT 5.1 (Preview)</option>
-                <option value="openrouter:anthropic/claude-opus-4.5">
-                  Claude Opus 4.5 (Native)
-                </option>
+                <option value="openrouter:anthropic/claude-opus-4.5">Claude Opus 4.5</option>
                 <option value="openrouter:google/gemini-3">Gemini 3 Ultra</option>
                 <option value="openrouter:x-ai/grok-3">Grok 3</option>
                 <option value="openrouter:deepseek/deepseek-r1">DeepSeek R1 (Reasoning)</option>
               </optgroup>
 
               <optgroup label="🧠 Anthropic Claude Ailesi">
-                <option value="claude-sonnet-4">Claude Sonnet 4 (Native)</option>
+                <option value="claude-sonnet-4">Claude Sonnet 4</option>
                 <option value="openrouter:anthropic/claude-3.7-sonnet">Claude 3.7 Sonnet</option>
                 <option value="openrouter:anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
                 <option value="openrouter:anthropic/claude-opus-4.1">Claude Opus 4.1</option>
@@ -526,7 +531,7 @@
               </optgroup>
 
               <optgroup label="✨ OpenAI GPT & O Serisi">
-                <option value="gpt-4o">GPT-4o (Native)</option>
+                <option value="gpt-4o">GPT-4o</option>
                 <option value="openrouter:openai/gpt-5">GPT 5</option>
                 <option value="openrouter:openai/gpt-4o">GPT-4o</option>
                 <option value="openrouter:openai/o3">OpenAI o3</option>
@@ -535,7 +540,7 @@
               </optgroup>
 
               <optgroup label="⚡ Google Gemini">
-                <option value="gemini-3-pro-preview">Gemini 3 Pro (Native)</option>
+                <option value="gemini-3-pro-preview">Gemini 3 Pro</option>
                 <option value="openrouter:google/gemini-2.5-pro">Gemini 2.5 Pro</option>
                 <option value="openrouter:google/gemini-2.5-flash-preview-09-2025">
                   Gemini 2.5 Flash

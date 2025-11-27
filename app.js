@@ -41,6 +41,7 @@ let customModels = []; // Kullanıcının eklediği özel modeller
 let uploadedFile = null; // Yüklenen dosya (görsel/video)
 let activeTab = 'chat'; // 'chat' veya 'image-gen'
 let compareMode = false; // Karşılaştırma modu
+let compareHistory = []; // Karşılaştırma geçmişi
 
 // --- DİL DESTEĞİ ---
 // LANGUAGES ve UI_TRANSLATIONS artık languages.js dosyasında tanımlıdır
@@ -1050,6 +1051,10 @@ async function deployMultipleFiles(btn) {
     const finalSubdomain = site.subdomain || subdomain;
     const url = `https://${finalSubdomain}.puter.site`;
 
+    // Butonun yanına database butonu ekle
+    const btnContainer = btn.parentElement;
+    const dbBtnId = `db-btn-${randomId}`;
+
     btn.className =
       'text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg flex items-center gap-2 transition-colors';
     btn.innerHTML = `<i data-lucide="external-link" class="w-3 h-3"></i> ${finalSubdomain}`;
@@ -1058,6 +1063,20 @@ async function deployMultipleFiles(btn) {
       e.preventDefault();
       window.open(url, '_blank');
     };
+
+    // Database butonu ekle
+    if (btnContainer && !document.getElementById(dbBtnId)) {
+      const dbBtn = document.createElement('button');
+      dbBtn.id = dbBtnId;
+      dbBtn.className =
+        'text-xs bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-lg flex items-center gap-2 transition-colors';
+      dbBtn.innerHTML = `<i data-lucide="database" class="w-3 h-3"></i> Database`;
+      dbBtn.onclick = (e) => {
+        e.preventDefault();
+        createDatabaseForSite(finalSubdomain, dbBtn);
+      };
+      btnContainer.appendChild(dbBtn);
+    }
   } catch (err) {
     logError(err, 'deployMultipleFiles');
     btn.innerHTML = `⚠️ Hata`;
@@ -1066,6 +1085,124 @@ async function deployMultipleFiles(btn) {
     setTimeout(() => {
       btn.innerHTML = originalHtml;
       btn.className = originalClass;
+      btn.disabled = false;
+    }, 3000);
+  }
+
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+}
+
+// --- DATABASE OLUŞTURMA ---
+async function createDatabaseForSite(subdomain, btn) {
+  const originalHtml = btn.innerHTML;
+  btn.innerHTML = `<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> Oluşturuluyor...`;
+  btn.disabled = true;
+
+  try {
+    // puter.fs ile JSON tabanlı database oluştur
+    const dbFileName = `db_${subdomain}.json`;
+
+    // Boş database dosyası oluştur
+    const initialDb = {
+      name: subdomain,
+      created: Date.now(),
+      tables: {},
+      data: {},
+    };
+
+    await puter.fs.write(dbFileName, JSON.stringify(initialDb, null, 2));
+
+    // Database API helper dosyası oluştur
+    const dbHelperCode = `
+// Database Helper for ${subdomain}
+// Bu dosyayı sitenizde kullanarak veritabanına erişebilirsiniz
+
+const DB = {
+  filename: '${dbFileName}',
+  
+  async load() {
+    try {
+      const file = await puter.fs.read(this.filename);
+      return JSON.parse(await file.text());
+    } catch (e) {
+      return { name: '${subdomain}', tables: {}, data: {} };
+    }
+  },
+  
+  async save(data) {
+    await puter.fs.write(this.filename, JSON.stringify(data, null, 2));
+  },
+  
+  async get(table, key) {
+    const db = await this.load();
+    return db.data[table]?.[key] || null;
+  },
+  
+  async set(table, key, value) {
+    const db = await this.load();
+    if (!db.data[table]) db.data[table] = {};
+    db.data[table][key] = value;
+    await this.save(db);
+    return true;
+  },
+  
+  async delete(table, key) {
+    const db = await this.load();
+    if (db.data[table] && db.data[table][key]) {
+      delete db.data[table][key];
+      await this.save(db);
+      return true;
+    }
+    return false;
+  },
+  
+  async list(table) {
+    const db = await this.load();
+    return db.data[table] || {};
+  },
+  
+  async createTable(tableName) {
+    const db = await this.load();
+    if (!db.tables[tableName]) {
+      db.tables[tableName] = { created: Date.now() };
+      db.data[tableName] = {};
+      await this.save(db);
+    }
+    return true;
+  }
+};
+
+// Kullanım örneği:
+// await DB.createTable('users');
+// await DB.set('users', 'user1', { name: 'Ali', email: 'ali@example.com' });
+// const user = await DB.get('users', 'user1');
+// console.log(user);
+`;
+
+    // Helper dosyasını kaydet
+    await puter.fs.write(`db_helper_${subdomain}.js`, dbHelperCode);
+
+    btn.className =
+      'text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg flex items-center gap-2 transition-colors';
+    btn.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i> DB Hazır`;
+
+    // Tıklanınca database bilgisini göster
+    btn.onclick = (e) => {
+      e.preventDefault();
+      alert(
+        `Database oluşturuldu!\n\nDosya: ${dbFileName}\nHelper: db_helper_${subdomain}.js\n\nSitenizde database kullanmak için helper dosyasını import edin.`
+      );
+    };
+
+    console.log('✅ Database oluşturuldu:', dbFileName);
+  } catch (err) {
+    console.error('Database oluşturma hatası:', err);
+    btn.innerHTML = `⚠️ Hata`;
+
+    setTimeout(() => {
+      btn.innerHTML = originalHtml;
       btn.disabled = false;
     }, 3000);
   }
@@ -1536,9 +1673,11 @@ function toggleCompareMode() {
   if (comparePanel) comparePanel.classList.toggle('hidden', !compareMode);
   if (compareModeBtn) compareModeBtn.classList.toggle('text-blue-400', compareMode);
 
-  // Karşılaştırma paneli açıldığında model seçicileri doldur
+  // Karşılaştırma paneli açıldığında model seçicileri doldur ve geçmişi yükle
   if (compareMode) {
     populateCompareModelSelectors();
+    loadCompareHistory();
+    renderCompareResults();
   }
 }
 
@@ -1578,6 +1717,8 @@ async function runComparison() {
 
   const model1 = document.getElementById('compare-model-1')?.value;
   const model2 = document.getElementById('compare-model-2')?.value;
+  const model1Name = document.getElementById('compare-model-1')?.selectedOptions[0]?.text || model1;
+  const model2Name = document.getElementById('compare-model-2')?.selectedOptions[0]?.text || model2;
 
   const result1 = document.getElementById('compare-result-1');
   const result2 = document.getElementById('compare-result-2');
@@ -1604,9 +1745,23 @@ async function runComparison() {
     const content1 = parseAIResponse(response1);
     const content2 = parseAIResponse(response2);
 
+    // Geçmişe ekle
+    compareHistory.push({
+      id: Date.now().toString(),
+      prompt: input,
+      model1: { id: model1, name: model1Name, response: content1 },
+      model2: { id: model2, name: model2Name, response: content2 },
+      timestamp: Date.now(),
+    });
+
+    // Geçmişi localStorage'a kaydet
+    saveCompareHistory();
+
     // Sonuçları göster
-    result1.innerHTML = `<div class="markdown-body">${marked.parse(content1)}</div>`;
-    result2.innerHTML = `<div class="markdown-body">${marked.parse(content2)}</div>`;
+    renderCompareResults();
+
+    // Input'u temizle
+    document.getElementById('compare-input').value = '';
 
     if (typeof lucide !== 'undefined') {
       lucide.createIcons();
@@ -1616,6 +1771,116 @@ async function runComparison() {
     result1.innerHTML = `<div class="text-red-400">${t('error') || 'Hata'}: ${err.message}</div>`;
     result2.innerHTML = `<div class="text-red-400">${t('error') || 'Hata'}: ${err.message}</div>`;
   }
+}
+
+// Karşılaştırma sonuçlarını render et
+function renderCompareResults() {
+  const result1 = document.getElementById('compare-result-1');
+  const result2 = document.getElementById('compare-result-2');
+
+  if (!result1 || !result2) return;
+
+  if (compareHistory.length === 0) {
+    result1.innerHTML = `<div class="text-gray-500 text-center py-8">Karşılaştırma sonucu burada görünecek</div>`;
+    result2.innerHTML = `<div class="text-gray-500 text-center py-8">Karşılaştırma sonucu burada görünecek</div>`;
+    return;
+  }
+
+  // Tüm geçmişi göster
+  let html1 = '';
+  let html2 = '';
+
+  compareHistory.forEach((item, index) => {
+    const deployBtn1 = generateDeployButton(item.model1.response, `compare-deploy-1-${index}`);
+    const deployBtn2 = generateDeployButton(item.model2.response, `compare-deploy-2-${index}`);
+
+    html1 += `
+      <div class="mb-6 pb-6 border-b border-[#2f3345] last:border-0">
+        <div class="text-xs text-blue-400 mb-2 flex items-center gap-2">
+          <i data-lucide="user" class="w-3 h-3"></i>
+          <span class="truncate">${item.prompt}</span>
+        </div>
+        <div class="markdown-body">${marked.parse(item.model1.response)}</div>
+        ${deployBtn1}
+      </div>
+    `;
+
+    html2 += `
+      <div class="mb-6 pb-6 border-b border-[#2f3345] last:border-0">
+        <div class="text-xs text-blue-400 mb-2 flex items-center gap-2">
+          <i data-lucide="user" class="w-3 h-3"></i>
+          <span class="truncate">${item.prompt}</span>
+        </div>
+        <div class="markdown-body">${marked.parse(item.model2.response)}</div>
+        ${deployBtn2}
+      </div>
+    `;
+  });
+
+  result1.innerHTML = html1;
+  result2.innerHTML = html2;
+
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+}
+
+// Kod içeren yanıtlar için deploy butonu oluştur
+function generateDeployButton(content, buttonId) {
+  const htmlMatch = content.match(/```html([\s\S]*?)```/);
+  const cssMatch = content.match(/```css([\s\S]*?)```/);
+  const jsMatch = content.match(/```(?:javascript|js)([\s\S]*?)```/);
+
+  if (!htmlMatch) return '';
+
+  const htmlCode = htmlMatch[1].trim();
+  const cssCode = cssMatch ? cssMatch[1].trim() : '';
+  const jsCode = jsMatch ? jsMatch[1].trim() : '';
+
+  const deployData = JSON.stringify({
+    html: htmlCode,
+    css: cssCode,
+    js: jsCode,
+  }).replace(/"/g, '&quot;');
+
+  return `
+    <div class="mt-3 flex flex-wrap gap-2">
+      <button onclick="deployMultipleFiles(this)" data-deploy="${deployData}" id="${buttonId}" class="text-xs bg-[#3b52d4] hover:bg-[#2e42b5] text-white px-3 py-2 rounded-lg flex items-center gap-2 transition-colors">
+        <i data-lucide="rocket" class="w-3 h-3"></i> ${t('deploy') || 'Canlıya Al'}
+      </button>
+    </div>
+  `;
+}
+
+// Karşılaştırma geçmişini kaydet
+function saveCompareHistory() {
+  try {
+    localStorage.setItem('compare_history', JSON.stringify(compareHistory));
+  } catch (e) {
+    console.warn('Karşılaştırma geçmişi kaydedilemedi:', e);
+  }
+}
+
+// Karşılaştırma geçmişini yükle
+function loadCompareHistory() {
+  try {
+    const saved = localStorage.getItem('compare_history');
+    if (saved) {
+      compareHistory = JSON.parse(saved);
+    }
+  } catch (e) {
+    console.warn('Karşılaştırma geçmişi yüklenemedi:', e);
+    compareHistory = [];
+  }
+}
+
+// Karşılaştırma geçmişini temizle
+function clearCompareHistory() {
+  if (!confirm('Tüm karşılaştırma geçmişini silmek istediğinize emin misiniz?')) return;
+
+  compareHistory = [];
+  saveCompareHistory();
+  renderCompareResults();
 }
 
 // --- FARKLI MODELLE YENİDEN OLUŞTUR ---
