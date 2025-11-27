@@ -348,6 +348,18 @@ Language: ${langName}`;
 
     let response;
 
+    console.log('🚀 API çağrısı başlatılıyor...', { modelId, hasFile: !!uploadedFile });
+
+    // Puter SDK kontrolü
+    if (typeof puter === 'undefined') {
+      throw new Error('Puter SDK yüklenmedi. Lütfen sayfayı yenileyin.');
+    }
+    if (!puter.ai || !puter.ai.chat) {
+      throw new Error('Puter AI servisi kullanılamıyor. Giriş yapmanız gerekebilir.');
+    }
+
+    console.log('✅ Puter SDK hazır, AI çağrısı yapılıyor...');
+
     // Görsel/Video dosyası varsa vision API kullan
     if (uploadedFile && uploadedFile.base64) {
       const messages = [
@@ -361,12 +373,16 @@ Language: ${langName}`;
           },
         },
       ];
+      console.log('📷 Vision API çağrılıyor...');
       response = await puter.ai.chat(messages, { model: modelId });
+      console.log('✅ Vision API yanıt aldı:', response);
 
       // Dosyayı temizle
       clearUploadedFile();
     } else {
+      console.log('💬 Chat API çağrılıyor...');
       response = await puter.ai.chat(fullPrompt, { model: modelId });
+      console.log('✅ Chat API yanıt aldı:', response);
     }
 
     // --- HATA DÜZELTMESİ: API Yanıt Parsing ---
@@ -404,10 +420,12 @@ Language: ${langName}`;
 
     currentChat.messages.push({ role: 'assistant', content: content, timestamp: Date.now() });
   } catch (err) {
+    console.error('❌ handleSendClick hatası:', err);
+    console.error('Error stack:', err.stack);
     logError(err, 'handleSendClick');
     currentChat.messages.push({
       role: 'assistant',
-      content: `⚠️ Hata: ${err.message || 'Bağlantı koptu.'}`,
+      content: `⚠️ Hata: ${err.message || 'Bağlantı koptu.'}\n\nDetay: ${JSON.stringify(err, null, 2)}`,
     });
   } finally {
     currentChat.isProcessing = false;
