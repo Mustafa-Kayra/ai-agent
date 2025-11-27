@@ -318,7 +318,14 @@ async function handleSendClick() {
     if (LANGUAGES[currentLanguage]) {
       const langName = LANGUAGES[currentLanguage].prompt;
       // Prompt'u İngilizce olarak yaz, model daha iyi anlar
-      langPrompt = `IMPORTANT: You MUST respond entirely in ${langName}. Do not use any other language.`;
+      // CRITICAL: Dili zorla
+      langPrompt = `🔴 CRITICAL INSTRUCTION - HIGHEST PRIORITY 🔴
+You MUST respond ENTIRELY and EXCLUSIVELY in ${langName} language.
+- Every single word, sentence, and paragraph MUST be in ${langName}
+- Do NOT mix languages
+- Do NOT use English or any other language except ${langName}
+- This is MANDATORY and NON-NEGOTIABLE
+Language: ${langName}`;
     }
 
     const stylePrompt =
