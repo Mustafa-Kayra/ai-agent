@@ -726,7 +726,25 @@ async function handleAuth() {
       authBtn.innerText = 'Signing in...';
     }
 
-    const user = await puter.auth.signIn();
+    // Puter.js signIn with better error handling
+    let user;
+    try {
+      user = await puter.auth.signIn();
+    } catch (authError) {
+      // Popup engellenmiş olabilir
+      if (authError.message && authError.message.includes('popup')) {
+        throw new Error(
+          'Popup engellendi. Lütfen tarayıcınızın popup ayarlarını kontrol edin ve tekrar deneyin.'
+        );
+      }
+      throw authError;
+    }
+
+    // Kullanıcı bilgilerini kontrol et
+    if (!user) {
+      // getUser ile tekrar dene
+      user = await puter.auth.getUser();
+    }
 
     if (user && user.username) {
       isUserSignedIn = true;
@@ -746,6 +764,9 @@ async function handleAuth() {
       if (chats.length > 0) {
         loadChatToUI(chats[0].id);
       }
+
+      // Başarı bildirimi
+      console.log('✅ Giriş başarılı:', user.username);
     } else {
       throw new Error('Kullanıcı bilgisi alınamadı');
     }
@@ -758,12 +779,18 @@ async function handleAuth() {
     }
 
     // Hata detayına göre mesaj
-    const errorMsg =
-      e.message === 'User cancelled sign-in'
-        ? 'Giriş iptal edildi.'
-        : 'Giriş yapılamadı. Lütfen tekrar deneyin.';
+    let errorMsg = 'Giriş yapılamadı. Lütfen tekrar deneyin.';
+
+    if (e.message.includes('cancelled') || e.message.includes('iptal')) {
+      errorMsg = 'Giriş iptal edildi.';
+    } else if (e.message.includes('popup')) {
+      errorMsg = e.message;
+    } else if (e.message.includes('network')) {
+      errorMsg = 'Ağ hatası. İnternet bağlantınızı kontrol edin.';
+    }
 
     alert(errorMsg);
+    console.error('Auth error:', e);
   }
 }
 
@@ -1445,6 +1472,45 @@ function setupEventListeners() {
     });
   }
 }
+
+// Puter auth callback handler
+// Puter popup'tan dönüldüğünde tetiklenir
+window.addEventListener('focus', async () => {
+  // Sadece auth bekleniyorsa ve kullanıcı giriş yapmamışsa kontrol et
+  if (!isUserSignedIn && typeof puter !== 'undefined') {
+    try {
+      const user = await puter.auth.getUser();
+      if (user && user.username) {
+        isUserSignedIn = true;
+        document.getElementById('username').innerText = user.username;
+        document.getElementById('user-avatar').innerText = user.username.charAt(0).toUpperCase();
+
+        // Auth butonunu gizle
+        const authBtnParent = document.querySelector('#auth-btn-text')?.parentElement;
+        if (authBtnParent) {
+          authBtnParent.style.display = 'none';
+        }
+
+        const authBtn = document.getElementById('auth-btn-text');
+        if (authBtn) {
+          authBtn.innerText = t('login');
+        }
+
+        // Sohbetleri yükle
+        await loadChats();
+
+        // UI'ı güncelle
+        if (chats.length > 0) {
+          loadChatToUI(chats[0].id);
+        }
+
+        console.log('✅ Giriş başarılı (callback):', user.username);
+      }
+    } catch (e) {
+      // Sessizce yakala - kullanıcı henüz giriş yapmadı olabilir
+    }
+  }
+});
 
 // DOM hazır olduğunda uygulamayı başlat
 document.addEventListener('DOMContentLoaded', initApp);
