@@ -18,6 +18,18 @@
  * - Resim oluşturma (Nano Banana)
  */
 
+// --- SUPABASE CLIENT ---
+const SUPABASE_URL = 'https://0ec90b57d6e95fcbda19832f.supabase.co';
+const SUPABASE_ANON_KEY =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJib2x0IiwicmVmIjoiMGVjOTBiNTdkNmU5NWZjYmRhMTk4MzJmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg4ODE1NzQsImV4cCI6MTc1ODg4MTU3NH0.9I8-U0x86Ak8t2DGaIk0HfvTSLsAyzdnz-Nw00mMkKw';
+
+let supabase;
+// Supabase client'ı başlat (sayfa yüklendiğinde)
+if (typeof window.supabase !== 'undefined') {
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  console.log('✅ Supabase client initialized');
+}
+
 // --- STATE DEĞİŞKENLERİ ---
 let chats = [];
 let activeChatId = null;
@@ -698,142 +710,17 @@ function setMode(mode, updateChat = true) {
 }
 
 // --- YARDIMCI FONKSİYONLAR ---
-let authInProgress = false;
-let authCheckInterval = null;
-
 async function handleAuth() {
-  const authBtn = document.getElementById('auth-btn-text');
-  const originalText = authBtn ? authBtn.innerText : '';
-
-  try {
-    // Puter SDK'nın yüklenmesini bekle
-    if (typeof puter === 'undefined') {
-      if (authBtn) authBtn.innerText = 'Loading SDK...';
-
-      // 5 saniye bekle
-      let attempts = 0;
-      while (typeof puter === 'undefined' && attempts < 50) {
-        await new Promise((r) => setTimeout(r, 100));
-        attempts++;
-      }
-
-      if (typeof puter === 'undefined') {
-        alert('Puter SDK yüklenemedi. Lütfen sayfayı yenileyin.');
-        if (authBtn) authBtn.innerText = originalText;
-        return;
-      }
-    }
-
-    // Loading göster
-    if (authBtn) {
-      authBtn.innerText = 'Signing in...';
-    }
-
-    authInProgress = true;
-    console.log('🔐 Auth başlatılıyor...');
-
-    try {
-      const user = await puter.auth.signIn();
-      console.log('✅ signIn döndü:', user);
-
-      if (user && user.username) {
-        await completeAuthSuccess(user);
-      } else {
-        console.log('⏳ signIn null döndü, polling başlatılıyor...');
-        startAuthPolling();
-      }
-    } catch (authError) {
-      console.error('❌ signIn hatası:', authError);
-
-      if (authError.message && (authError.message.includes('popup') || authError.message.includes('window'))) {
-        console.log('🔄 Popup algılandı, polling başlatılıyor...');
-        startAuthPolling();
-      } else {
-        throw authError;
-      }
-    }
-  } catch (e) {
-    authInProgress = false;
-    logError(e, 'handleAuth');
-
-    // Kullanıcıya hata göster
-    if (authBtn) {
-      authBtn.innerText = originalText;
-    }
-
-    // Hata detayına göre mesaj
-    let errorMsg = 'Giriş yapılamadı. Lütfen tekrar deneyin.';
-
-    if (e.message.includes('cancelled') || e.message.includes('iptal')) {
-      errorMsg = 'Giriş iptal edildi.';
-    } else if (e.message.includes('popup')) {
-      errorMsg = 'Popup açıldı. Puter penceresinde giriş yapın ve bu sayfaya geri dönün.';
-    } else if (e.message.includes('network')) {
-      errorMsg = 'Ağ hatası. İnternet bağlantınızı kontrol edin.';
-    }
-
-    alert(errorMsg);
-    console.error('Auth error:', e);
-  }
-}
-
-function startAuthPolling() {
-  const authBtn = document.getElementById('auth-btn-text');
-  if (authBtn) {
-    authBtn.innerText = 'Waiting for login...';
-  }
-
-  let attempts = 0;
-  authCheckInterval = setInterval(async () => {
-    attempts++;
-    console.log(`🔍 Auth kontrolü #${attempts}...`);
-
-    try {
-      const user = await puter.auth.getUser();
-      if (user && user.username) {
-        clearInterval(authCheckInterval);
-        authCheckInterval = null;
-        console.log('✅ Auth polling başarılı:', user);
-        await completeAuthSuccess(user);
-      } else if (attempts > 60) {
-        clearInterval(authCheckInterval);
-        authCheckInterval = null;
-        authInProgress = false;
-
-        const authBtn = document.getElementById('auth-btn-text');
-        if (authBtn) {
-          authBtn.innerText = t('login');
-        }
-
-        alert('Giriş zaman aşımına uğradı. Lütfen tekrar deneyin.');
-        console.log('⏰ Auth timeout');
-      }
-    } catch (e) {
-      console.error('Polling hatası:', e);
-    }
-  }, 1000);
-}
-
-async function completeAuthSuccess(user) {
-  authInProgress = false;
-
-  if (authCheckInterval) {
-    clearInterval(authCheckInterval);
-    authCheckInterval = null;
-  }
+  // Demo Mode - No authentication required
+  const demoUsername = 'Demo User';
 
   isUserSignedIn = true;
-  document.getElementById('username').innerText = user.username;
-  document.getElementById('user-avatar').innerText = user.username.charAt(0).toUpperCase();
+  document.getElementById('username').innerText = demoUsername;
+  document.getElementById('user-avatar').innerText = demoUsername.charAt(0).toUpperCase();
 
   const authBtnParent = document.querySelector('#auth-btn-text')?.parentElement;
   if (authBtnParent) {
     authBtnParent.style.display = 'none';
-  }
-
-  const authBtn = document.getElementById('auth-btn-text');
-  if (authBtn) {
-    authBtn.innerText = t('login');
   }
 
   await loadChats();
@@ -842,7 +729,7 @@ async function completeAuthSuccess(user) {
     loadChatToUI(chats[0].id);
   }
 
-  console.log('✅ Giriş tamamlandı:', user.username);
+  console.log('✅ Demo mode - authentication bypassed');
 }
 
 async function saveChats() {
