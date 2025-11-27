@@ -86,6 +86,17 @@ const UI_TR = {
   savingToCloud: 'Buluta kaydediliyor...',
   puterApiUnavailable: 'Puter API mevcut değil. Lütfen giriş yapın.',
   imageLoadError: 'Resim yüklenemedi',
+  // Yeni çeviriler - Model karşılaştırma ve regenerate
+  compare: 'Karşılaştır',
+  tryAnotherModel: 'Başka modelle dene:',
+  regenerate: 'Yeniden Oluştur',
+  regenerating: 'Yeniden oluşturuluyor...',
+  loading: 'Yükleniyor...',
+  error: 'Hata',
+  noImages: 'Henüz resim oluşturulmadı',
+  confirmDeleteImage: 'Bu resmi silmek istediğinize emin misiniz?',
+  compareResult: 'Karşılaştırma sonucu burada görünecek',
+  askBothModels: 'Her iki modele de aynı soruyu sor...',
 };
 
 // Arayüz çevirileri - İngilizce
@@ -145,6 +156,17 @@ const UI_EN = {
   savingToCloud: 'Saving to cloud...',
   puterApiUnavailable: 'Puter API is not available. Please sign in.',
   imageLoadError: 'Image could not be loaded',
+  // New translations - Model comparison and regenerate
+  compare: 'Compare',
+  tryAnotherModel: 'Try another model:',
+  regenerate: 'Regenerate',
+  regenerating: 'Regenerating...',
+  loading: 'Loading...',
+  error: 'Error',
+  noImages: 'No images created yet',
+  confirmDeleteImage: 'Are you sure you want to delete this image?',
+  compareResult: 'Comparison result will appear here',
+  askBothModels: 'Ask the same question to both models...',
 };
 
 // Arayüz çevirileri - Çince
@@ -204,6 +226,17 @@ const UI_ZH = {
   savingToCloud: '正在保存到云端...',
   puterApiUnavailable: 'Puter API不可用。请登录。',
   imageLoadError: '图片加载失败',
+  // 新翻译 - 模型比较和重新生成
+  compare: '比较',
+  tryAnotherModel: '尝试其他模型：',
+  regenerate: '重新生成',
+  regenerating: '重新生成中...',
+  loading: '加载中...',
+  error: '错误',
+  noImages: '尚未创建图片',
+  confirmDeleteImage: '确定要删除这张图片吗？',
+  compareResult: '比较结果将显示在这里',
+  askBothModels: '向两个模型提出相同的问题...',
 };
 
 // Arayüz çevirileri - İspanyolca
@@ -263,6 +296,17 @@ const UI_ES = {
   savingToCloud: 'Guardando en la nube...',
   puterApiUnavailable: 'La API de Puter no está disponible. Por favor, inicie sesión.',
   imageLoadError: 'No se pudo cargar la imagen',
+  // Nuevas traducciones - Comparación de modelos y regenerar
+  compare: 'Comparar',
+  tryAnotherModel: 'Probar otro modelo:',
+  regenerate: 'Regenerar',
+  regenerating: 'Regenerando...',
+  loading: 'Cargando...',
+  error: 'Error',
+  noImages: 'Aún no se han creado imágenes',
+  confirmDeleteImage: '¿Estás seguro de que deseas eliminar esta imagen?',
+  compareResult: 'El resultado de la comparación aparecerá aquí',
+  askBothModels: 'Haz la misma pregunta a ambos modelos...',
 };
 
 // Arayüz çevirileri - Arapça
@@ -322,6 +366,17 @@ const UI_AR = {
   savingToCloud: 'جاري الحفظ في السحابة...',
   puterApiUnavailable: 'واجهة برمجة التطبيقات Puter غير متوفرة. يرجى تسجيل الدخول.',
   imageLoadError: 'تعذر تحميل الصورة',
+  // ترجمات جديدة - مقارنة النماذج وإعادة الإنشاء
+  compare: 'مقارنة',
+  tryAnotherModel: 'جرب نموذجاً آخر:',
+  regenerate: 'إعادة الإنشاء',
+  regenerating: 'جاري إعادة الإنشاء...',
+  loading: 'جاري التحميل...',
+  error: 'خطأ',
+  noImages: 'لم يتم إنشاء صور بعد',
+  confirmDeleteImage: 'هل أنت متأكد من حذف هذه الصورة؟',
+  compareResult: 'ستظهر نتيجة المقارنة هنا',
+  askBothModels: 'اطرح نفس السؤال على كلا النموذجين...',
 };
 
 // Arayüz çevirileri - Hintçe
@@ -381,6 +436,17 @@ const UI_HI = {
   savingToCloud: 'क्लाउड में सहेजा जा रहा है...',
   puterApiUnavailable: 'Puter API उपलब्ध नहीं है। कृपया साइन इन करें।',
   imageLoadError: 'छवि लोड नहीं हो सकी',
+  // नई अनुवाद - मॉडल तुलना और पुनर्जनन
+  compare: 'तुलना करें',
+  tryAnotherModel: 'दूसरा मॉडल आज़माएं:',
+  regenerate: 'पुनर्जनन करें',
+  regenerating: 'पुनर्जनन हो रहा है...',
+  loading: 'लोड हो रहा है...',
+  error: 'त्रुटि',
+  noImages: 'अभी तक कोई छवि नहीं बनी',
+  confirmDeleteImage: 'क्या आप इस छवि को हटाना चाहते हैं?',
+  compareResult: 'तुलना परिणाम यहां दिखाई देगा',
+  askBothModels: 'दोनों मॉडलों से एक ही सवाल पूछें...',
 };
 
 // Arayüz çevirileri - Portekizce
@@ -440,6 +506,17 @@ const UI_PT = {
   savingToCloud: 'Salvando na nuvem...',
   puterApiUnavailable: 'A API do Puter não está disponível. Por favor, faça login.',
   imageLoadError: 'Não foi possível carregar a imagem',
+  // Novas traduções - Comparação de modelos e regenerar
+  compare: 'Comparar',
+  tryAnotherModel: 'Tentar outro modelo:',
+  regenerate: 'Regenerar',
+  regenerating: 'Regenerando...',
+  loading: 'Carregando...',
+  error: 'Erro',
+  noImages: 'Nenhuma imagem criada ainda',
+  confirmDeleteImage: 'Tem certeza de que deseja excluir esta imagem?',
+  compareResult: 'O resultado da comparação aparecerá aqui',
+  askBothModels: 'Faça a mesma pergunta para ambos os modelos...',
 };
 
 // Arayüz çevirileri - Rusça
@@ -500,6 +577,17 @@ const UI_RU = {
   savingToCloud: 'Сохранение в облаке...',
   puterApiUnavailable: 'Puter API недоступен. Пожалуйста, войдите в систему.',
   imageLoadError: 'Не удалось загрузить изображение',
+  // Новые переводы - Сравнение моделей и повторная генерация
+  compare: 'Сравнить',
+  tryAnotherModel: 'Попробовать другую модель:',
+  regenerate: 'Перегенерировать',
+  regenerating: 'Перегенерация...',
+  loading: 'Загрузка...',
+  error: 'Ошибка',
+  noImages: 'Изображения ещё не созданы',
+  confirmDeleteImage: 'Вы уверены, что хотите удалить это изображение?',
+  compareResult: 'Результат сравнения появится здесь',
+  askBothModels: 'Задайте один и тот же вопрос обеим моделям...',
 };
 
 // Arayüz çevirileri - Japonca
@@ -560,6 +648,17 @@ const UI_JA = {
   savingToCloud: 'クラウドに保存中...',
   puterApiUnavailable: 'Puter APIが利用できません。サインインしてください。',
   imageLoadError: '画像を読み込めませんでした',
+  // 新しい翻訳 - モデル比較と再生成
+  compare: '比較',
+  tryAnotherModel: '別のモデルを試す：',
+  regenerate: '再生成',
+  regenerating: '再生成中...',
+  loading: '読み込み中...',
+  error: 'エラー',
+  noImages: 'まだ画像が作成されていません',
+  confirmDeleteImage: 'この画像を削除してもよろしいですか？',
+  compareResult: '比較結果がここに表示されます',
+  askBothModels: '両方のモデルに同じ質問をする...',
 };
 
 // Arayüz çevirileri - Almanca
@@ -620,6 +719,17 @@ const UI_DE = {
   savingToCloud: 'Wird in der Cloud gespeichert...',
   puterApiUnavailable: 'Die Puter API ist nicht verfügbar. Bitte melden Sie sich an.',
   imageLoadError: 'Bild konnte nicht geladen werden',
+  // Neue Übersetzungen - Modellvergleich und Regenerierung
+  compare: 'Vergleichen',
+  tryAnotherModel: 'Anderes Modell ausprobieren:',
+  regenerate: 'Neu generieren',
+  regenerating: 'Wird neu generiert...',
+  loading: 'Wird geladen...',
+  error: 'Fehler',
+  noImages: 'Noch keine Bilder erstellt',
+  confirmDeleteImage: 'Sind Sie sicher, dass Sie dieses Bild löschen möchten?',
+  compareResult: 'Das Vergleichsergebnis wird hier angezeigt',
+  askBothModels: 'Stellen Sie beiden Modellen die gleiche Frage...',
 };
 
 // Arayüz çevirileri - Fransızca
@@ -740,6 +850,17 @@ const UI_KO = {
   savingToCloud: '클라우드에 저장 중...',
   puterApiUnavailable: 'Puter API를 사용할 수 없습니다. 로그인해 주세요.',
   imageLoadError: '이미지를 불러올 수 없습니다',
+  // Nouvelles traductions - Comparaison de modèles et régénération
+  compare: 'Comparer',
+  tryAnotherModel: 'Essayer un autre modèle :',
+  regenerate: 'Régénérer',
+  regenerating: 'Régénération...',
+  loading: 'Chargement...',
+  error: 'Erreur',
+  noImages: 'Aucune image créée pour le moment',
+  confirmDeleteImage: 'Êtes-vous sûr de vouloir supprimer cette image ?',
+  compareResult: 'Le résultat de la comparaison apparaîtra ici',
+  askBothModels: 'Posez la même question aux deux modèles...',
 };
 
 // Arayüz çevirileri - İtalyanca
@@ -785,7 +906,7 @@ const UI_IT = {
   confirmDeleteModel: 'Sei sicuro di voler eliminare questo modello?',
   unsupportedFileFormat: 'Formato file non supportato. Usa JPG, PNG, GIF, HEIC, MP4 o WEBM.',
   enterPrompt: 'Inserisci un prompt.',
-  imageError: 'Errore nella generazione dell\'immagine:',
+  imageError: "Errore nella generazione dell'immagine:",
   deploy: 'Deploy (Hosting)',
   deploying: 'Deploy in corso...',
   preparing: 'Preparazione...',
@@ -794,11 +915,11 @@ const UI_IT = {
   confirmDeleteChat: 'Sei sicuro di voler eliminare questa chat?',
   enterChatName: 'Inserisci il nuovo nome della chat:',
   generating: 'Generazione...',
-  imageGenError: 'Impossibile generare l\'immagine. Riprova.',
+  imageGenError: "Impossibile generare l'immagine. Riprova.",
   savedToCloud: 'Salvato nel cloud',
   savingToCloud: 'Salvataggio nel cloud...',
   puterApiUnavailable: 'API Puter non disponibile. Effettua il login.',
-  imageLoadError: 'Impossibile caricare l\'immagine',
+  imageLoadError: "Impossibile caricare l'immagine",
 };
 
 // Arayüz çevirileri - Vietnamca
@@ -842,7 +963,8 @@ const UI_VI = {
   sources: 'Nguồn:',
   modelIdRequired: 'Yêu cầu ID và tên mô hình.',
   confirmDeleteModel: 'Bạn có chắc muốn xóa mô hình này?',
-  unsupportedFileFormat: 'Định dạng tệp không được hỗ trợ. Sử dụng JPG, PNG, GIF, HEIC, MP4 hoặc WEBM.',
+  unsupportedFileFormat:
+    'Định dạng tệp không được hỗ trợ. Sử dụng JPG, PNG, GIF, HEIC, MP4 hoặc WEBM.',
   enterPrompt: 'Vui lòng nhập prompt.',
   imageError: 'Lỗi tạo hình ảnh:',
   deploy: 'Triển khai (Hosting)',
@@ -858,6 +980,17 @@ const UI_VI = {
   savingToCloud: 'Đang lưu vào đám mây...',
   puterApiUnavailable: 'API Puter không khả dụng. Vui lòng đăng nhập.',
   imageLoadError: 'Không thể tải hình ảnh',
+  // 새 번역 - 모델 비교 및 재생성
+  compare: '비교',
+  tryAnotherModel: '다른 모델 시도:',
+  regenerate: '재생성',
+  regenerating: '재생성 중...',
+  loading: '로딩 중...',
+  error: '오류',
+  noImages: '아직 생성된 이미지가 없습니다',
+  confirmDeleteImage: '이 이미지를 삭제하시겠습니까?',
+  compareResult: '비교 결과가 여기에 표시됩니다',
+  askBothModels: '두 모델에 같은 질문하기...',
 };
 
 // Arayüz çevirileri - Farsça
@@ -901,7 +1034,8 @@ const UI_FA = {
   sources: 'منابع:',
   modelIdRequired: 'شناسه و نام مدل الزامی است.',
   confirmDeleteModel: 'آیا مطمئن هستید که می‌خواهید این مدل را حذف کنید؟',
-  unsupportedFileFormat: 'فرمت فایل پشتیبانی نمی‌شود. از JPG, PNG, GIF, HEIC, MP4 یا WEBM استفاده کنید.',
+  unsupportedFileFormat:
+    'فرمت فایل پشتیبانی نمی‌شود. از JPG, PNG, GIF, HEIC, MP4 یا WEBM استفاده کنید.',
   enterPrompt: 'لطفاً یک پرامپت وارد کنید.',
   imageError: 'خطا در ایجاد تصویر:',
   deploy: 'استقرار (میزبانی)',
@@ -917,6 +1051,17 @@ const UI_FA = {
   savingToCloud: 'در حال ذخیره در ابر...',
   puterApiUnavailable: 'API Puter در دسترس نیست. لطفاً وارد شوید.',
   imageLoadError: 'نمی‌توان تصویر را بارگذاری کرد',
+  // Nuove traduzioni - Confronto modelli e rigenerazione
+  compare: 'Confronta',
+  tryAnotherModel: 'Prova un altro modello:',
+  regenerate: 'Rigenera',
+  regenerating: 'Rigenerazione...',
+  loading: 'Caricamento...',
+  error: 'Errore',
+  noImages: 'Nessuna immagine creata',
+  confirmDeleteImage: 'Sei sicuro di voler eliminare questa immagine?',
+  compareResult: 'Il risultato del confronto apparirà qui',
+  askBothModels: 'Fai la stessa domanda a entrambi i modelli...',
 };
 
 // Arayüz çevirileri - Lehçe
@@ -976,6 +1121,17 @@ const UI_PL = {
   savingToCloud: 'Zapisywanie w chmurze...',
   puterApiUnavailable: 'API Puter nie jest dostępne. Proszę się zalogować.',
   imageLoadError: 'Nie można załadować obrazu',
+  // Bản dịch mới - So sánh mô hình và tái tạo
+  compare: 'So sánh',
+  tryAnotherModel: 'Thử mô hình khác:',
+  regenerate: 'Tái tạo',
+  regenerating: 'Đang tái tạo...',
+  loading: 'Đang tải...',
+  error: 'Lỗi',
+  noImages: 'Chưa có hình ảnh nào được tạo',
+  confirmDeleteImage: 'Bạn có chắc muốn xóa hình ảnh này?',
+  compareResult: 'Kết quả so sánh sẽ xuất hiện ở đây',
+  askBothModels: 'Hỏi cùng một câu hỏi cho cả hai mô hình...',
 };
 
 // Arayüz çevirileri - Ukraynaca
@@ -998,7 +1154,7 @@ const UI_UK = {
   learningExpertDesc: 'Навчання сократичним методом.',
   askSomething: 'Запитайте щось...',
   liveThinking: '⚡ Живе мислення',
-  cloudMemory: '🔒 Хмарна пам\'ять',
+  cloudMemory: "🔒 Хмарна пам'ять",
   autoDeploy: '🚀 Авто-розгортання',
   conversationStyle: 'Стиль спілкування',
   normal: 'Звичайний',
@@ -1019,7 +1175,8 @@ const UI_UK = {
   sources: 'Джерела:',
   modelIdRequired: 'Потрібен ID та назва моделі.',
   confirmDeleteModel: 'Ви впевнені, що хочете видалити цю модель?',
-  unsupportedFileFormat: 'Непідтримуваний формат файлу. Використовуйте JPG, PNG, GIF, HEIC, MP4 або WEBM.',
+  unsupportedFileFormat:
+    'Непідтримуваний формат файлу. Використовуйте JPG, PNG, GIF, HEIC, MP4 або WEBM.',
   enterPrompt: 'Будь ласка, введіть запит.',
   imageError: 'Помилка генерації зображення:',
   deploy: 'Розгорнути (хостинг)',
@@ -1035,6 +1192,17 @@ const UI_UK = {
   savingToCloud: 'Збереження в хмарі...',
   puterApiUnavailable: 'API Puter недоступний. Будь ласка, увійдіть.',
   imageLoadError: 'Не вдалося завантажити зображення',
+  // ترجمه‌های جدید - مقایسه مدل و بازسازی
+  compare: 'مقایسه',
+  tryAnotherModel: 'مدل دیگر را امتحان کنید:',
+  regenerate: 'بازسازی',
+  regenerating: 'در حال بازسازی...',
+  loading: 'در حال بارگذاری...',
+  error: 'خطا',
+  noImages: 'هنوز تصویری ایجاد نشده',
+  confirmDeleteImage: 'آیا مطمئن هستید که می‌خواهید این تصویر را حذف کنید؟',
+  compareResult: 'نتیجه مقایسه اینجا نمایش داده می‌شود',
+  askBothModels: 'از هر دو مدل همان سوال را بپرسید...',
 };
 
 // Arayüz çevirileri - Romence
@@ -1078,7 +1246,8 @@ const UI_RO = {
   sources: 'Surse:',
   modelIdRequired: 'ID și numele modelului sunt necesare.',
   confirmDeleteModel: 'Sigur doriți să ștergeți acest model?',
-  unsupportedFileFormat: 'Format de fișier nesuportat. Utilizați JPG, PNG, GIF, HEIC, MP4 sau WEBM.',
+  unsupportedFileFormat:
+    'Format de fișier nesuportat. Utilizați JPG, PNG, GIF, HEIC, MP4 sau WEBM.',
   enterPrompt: 'Vă rugăm să introduceți un prompt.',
   imageError: 'Eroare la generarea imaginii:',
   deploy: 'Implementare (Hosting)',
@@ -1094,6 +1263,17 @@ const UI_RO = {
   savingToCloud: 'Se salvează în cloud...',
   puterApiUnavailable: 'API-ul Puter nu este disponibil. Vă rugăm să vă autentificați.',
   imageLoadError: 'Nu s-a putut încărca imaginea',
+  // Nowe tłumaczenia - Porównanie modeli i regeneracja
+  compare: 'Porównaj',
+  tryAnotherModel: 'Wypróbuj inny model:',
+  regenerate: 'Regeneruj',
+  regenerating: 'Regenerowanie...',
+  loading: 'Ładowanie...',
+  error: 'Błąd',
+  noImages: 'Nie utworzono jeszcze obrazów',
+  confirmDeleteImage: 'Czy na pewno chcesz usunąć ten obraz?',
+  compareResult: 'Wynik porównania pojawi się tutaj',
+  askBothModels: 'Zadaj to samo pytanie obu modelom...',
 };
 
 // Arayüz çevirileri - Hollandaca
@@ -1137,7 +1317,8 @@ const UI_NL = {
   sources: 'Bronnen:',
   modelIdRequired: 'Model-ID en naam zijn vereist.',
   confirmDeleteModel: 'Weet je zeker dat je dit model wilt verwijderen?',
-  unsupportedFileFormat: 'Niet-ondersteund bestandsformaat. Gebruik JPG, PNG, GIF, HEIC, MP4 of WEBM.',
+  unsupportedFileFormat:
+    'Niet-ondersteund bestandsformaat. Gebruik JPG, PNG, GIF, HEIC, MP4 of WEBM.',
   enterPrompt: 'Voer een prompt in.',
   imageError: 'Fout bij het genereren van afbeelding:',
   deploy: 'Implementeren (Hosting)',
@@ -1153,6 +1334,17 @@ const UI_NL = {
   savingToCloud: 'Opslaan in de cloud...',
   puterApiUnavailable: 'Puter API is niet beschikbaar. Log in.',
   imageLoadError: 'Kan afbeelding niet laden',
+  // Нові переклади - Порівняння моделей та повторна генерація
+  compare: 'Порівняти',
+  tryAnotherModel: 'Спробувати іншу модель:',
+  regenerate: 'Перегенерувати',
+  regenerating: 'Перегенерація...',
+  loading: 'Завантаження...',
+  error: 'Помилка',
+  noImages: 'Зображення ще не створено',
+  confirmDeleteImage: 'Ви впевнені, що хочете видалити це зображення?',
+  compareResult: "Результат порівняння з'явиться тут",
+  askBothModels: 'Задайте те саме питання обом моделям...',
 };
 
 // Arayüz çevirileri - Tayvanca
@@ -1212,6 +1404,17 @@ const UI_TH = {
   savingToCloud: 'กำลังบันทึกในคลาวด์...',
   puterApiUnavailable: 'Puter API ไม่พร้อมใช้งาน กรุณาเข้าสู่ระบบ',
   imageLoadError: 'ไม่สามารถโหลดภาพได้',
+  // Traduceri noi - Comparație modele și regenerare
+  compare: 'Compară',
+  tryAnotherModel: 'Încearcă alt model:',
+  regenerate: 'Regenerează',
+  regenerating: 'Se regenerează...',
+  loading: 'Se încarcă...',
+  error: 'Eroare',
+  noImages: 'Nu au fost create imagini încă',
+  confirmDeleteImage: 'Sigur doriți să ștergeți această imagine?',
+  compareResult: 'Rezultatul comparației va apărea aici',
+  askBothModels: 'Pune aceeași întrebare la ambele modele...',
 };
 
 // Tüm çevirileri içeren nesne

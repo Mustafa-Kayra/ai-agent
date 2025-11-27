@@ -40,6 +40,7 @@ let customStylePrompt = ''; // Özel stil prompt'u
 let customModels = []; // Kullanıcının eklediği özel modeller
 let uploadedFile = null; // Yüklenen dosya (görsel/video)
 let activeTab = 'chat'; // 'chat' veya 'image-gen'
+let compareMode = false; // Karşılaştırma modu
 
 // --- DİL DESTEĞİ ---
 // LANGUAGES ve UI_TRANSLATIONS artık languages.js dosyasında tanımlıdır
@@ -172,17 +173,27 @@ function initIntersectionObserver() {
   }
 }
 
-// --- OPTİMİZASYON: LocalStorage Fallback ---
+// --- DATABASE KEY SCHEMA ---
+const DB_KEYS = {
+  CHATS: 'chats',
+  CHAT_TITLE: 'chat:{id}:title',
+  CHAT_MESSAGES: 'chat:{id}:messages',
+  IMAGES: 'image_gallery',
+  SETTINGS: 'settings',
+  CUSTOM_MODELS: 'custom_models',
+  STATS: 'stats',
+};
+
+// --- OPTİMİZASYON: Puter.kv ile Storage ---
 const Storage = {
-  // Puter.js kullanılamadığında LocalStorage kullan
+  // Puter.kv kullan, başarısız olursa localStorage fallback
   async save(key, data) {
-    if (isUserSignedIn && typeof puter !== 'undefined') {
+    if (typeof puter !== 'undefined' && puter.kv) {
       try {
-        await puter.fs.write(key, JSON.stringify(data));
+        await puter.kv.set(key, JSON.stringify(data));
         return true;
       } catch (e) {
-        // Puter başarısız olursa localStorage'a düş
-        console.warn('Puter.fs.write başarısız, localStorage kullanılıyor');
+        console.warn('Puter.kv başarısız, localStorage fallback');
       }
     }
     // LocalStorage fallback
@@ -196,13 +207,12 @@ const Storage = {
   },
 
   async load(key) {
-    if (isUserSignedIn && typeof puter !== 'undefined') {
+    if (typeof puter !== 'undefined' && puter.kv) {
       try {
-        const f = await puter.fs.read(key);
-        if (f) return JSON.parse(await f.text());
+        const data = await puter.kv.get(key);
+        if (data) return JSON.parse(data);
       } catch (e) {
-        // Puter başarısız olursa localStorage'dan oku
-        console.warn('Puter.fs.read başarısız, localStorage kullanılıyor');
+        console.warn('Puter.kv okuma başarısız, localStorage fallback');
       }
     }
     // LocalStorage fallback
@@ -212,6 +222,21 @@ const Storage = {
     } catch (e) {
       console.warn('LocalStorage okuma başarısız:', e);
       return null;
+    }
+  },
+
+  async delete(key) {
+    if (typeof puter !== 'undefined' && puter.kv) {
+      try {
+        await puter.kv.del(key);
+      } catch (e) {
+        console.warn('Puter.kv silme başarısız');
+      }
+    }
+    try {
+      localStorage.removeItem(key);
+    } catch (e) {
+      console.warn('LocalStorage silme başarısız:', e);
     }
   },
 };
@@ -446,9 +471,13 @@ function updateChatUI(chatId) {
   document.getElementById('empty-state').style.display = chat.messages.length ? 'none' : 'flex';
   document.getElementById('chat-header-title').innerText = chat.title || t('newChat');
 
+  // Tüm modelleri al (regenerate dropdown için)
+  const allModels = getAllModels();
+
   // Mesajları render et
-  chat.messages.forEach((msg) => {
+  chat.messages.forEach((msg, index) => {
     const div = document.createElement('div');
+    div.setAttribute('data-message-index', index);
     const isUser = msg.role === 'user';
     div.className = `flex gap-4 ${isUser ? 'flex-row-reverse' : 'flex-row'}`;
 
@@ -494,13 +523,34 @@ function updateChatUI(chatId) {
             </div>`;
     }
 
+    // AI cevapları için "Başka modelle dene" butonu ekle
+    if (!isUser && allModels.length > 0) {
+      const modelOptions = allModels
+        .map((m) => `<option value="${m.id}">${m.name}</option>`)
+        .join('');
+
+      contentHtml += `
+            <div class="regenerate-with-model mt-3 pt-3 border-t border-white/10">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <span class="text-xs text-gray-400">🔄 ${t('tryAnotherModel') || 'Başka modelle dene:'}</span>
+                    <select class="regenerate-model-select bg-[#151722] border border-[#2f3345] text-xs text-gray-200 rounded px-2 py-1" onchange="this.nextElementSibling.dataset.model = this.value">
+                        ${modelOptions}
+                    </select>
+                    <button class="regenerate-btn text-xs bg-[#3b52d4] hover:bg-[#2e42b5] text-white px-3 py-1 rounded flex items-center gap-1" onclick="regenerateWithModel(${index}, this.previousElementSibling.value)" data-model="${allModels[0]?.id || ''}">
+                        <i data-lucide="refresh-cw" class="w-3 h-3"></i>
+                        ${t('regenerate') || 'Yeniden Oluştur'}
+                    </button>
+                </div>
+            </div>`;
+    }
+
     div.innerHTML = `
             <div class="w-8 h-8 rounded-full ${avatarBg} flex-shrink-0 flex items-center justify-center text-white text-xs shadow-lg"><i data-lucide="${icon}" class="w-4 h-4"></i></div>
             <div class="max-w-[85%] min-w-0">
                 <div class="p-4 rounded-2xl ${isUser ? 'bg-[#3b52d4] text-white' : 'bg-[#1e2130] text-gray-100 border border-[#2f3345]'} shadow-md markdown-body">
                     ${contentHtml}
                 </div>
-                <div class="text-[10px] text-gray-600 mt-1 px-1 ${isUser ? 'text-right' : 'text-left'} opacity-60">${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                <div class="text-[10px] text-gray-600 mt-1 px-1 ${isUser ? 'text-right' : 'text-left'} opacity-60">${new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}${msg.model ? ` • ${msg.model.split('/').pop()}` : ''}</div>
             </div>
         `;
     container.appendChild(div);
@@ -1266,6 +1316,9 @@ async function generateImage() {
     }
 
     if (imageUrl) {
+      // Resmi galeriye kaydet
+      await saveImageToGallery(imageUrl, prompt, model);
+
       const imageLoadErrorMsg = t('imageLoadError');
       const imageCard = document.createElement('div');
       imageCard.className =
@@ -1301,18 +1354,271 @@ async function generateImage() {
   }
 }
 
+// --- RESİM GALERİSİ DATABASE KAYDI ---
+async function saveImageToGallery(imageUrl, prompt, model) {
+  const gallery = (await Storage.load(DB_KEYS.IMAGES)) || [];
+
+  gallery.unshift({
+    id: Date.now().toString(),
+    url: imageUrl,
+    prompt: prompt,
+    model: model,
+    timestamp: Date.now(),
+  });
+
+  // Max 50 resim tut
+  if (gallery.length > 50) gallery.pop();
+
+  await Storage.save(DB_KEYS.IMAGES, gallery);
+}
+
+async function loadImageGallery() {
+  const gallery = (await Storage.load(DB_KEYS.IMAGES)) || [];
+  const container = document.getElementById('image-gallery');
+  if (!container) return;
+
+  if (gallery.length === 0) {
+    container.innerHTML = `<div class="col-span-full text-center text-gray-500 py-8">${t('noImages') || 'Henüz resim oluşturulmadı'}</div>`;
+    return;
+  }
+
+  container.innerHTML = gallery
+    .map(
+      (img) => `
+    <div class="relative group rounded-xl overflow-hidden border border-[#2f3345]">
+      <img src="${img.url}" alt="${img.prompt}" class="w-full aspect-square object-cover">
+      <div class="absolute bottom-0 left-0 right-0 bg-black/60 p-2">
+        <div class="text-xs text-white truncate">${img.prompt}</div>
+        <div class="text-[10px] text-gray-400">${img.model}</div>
+      </div>
+      <button onclick="deleteImage('${img.id}')" class="absolute top-2 right-2 p-1 bg-red-500/80 rounded opacity-0 group-hover:opacity-100 transition-opacity">
+        <i data-lucide="trash-2" class="w-3 h-3 text-white"></i>
+      </button>
+    </div>
+  `
+    )
+    .join('');
+
+  if (typeof lucide !== 'undefined') {
+    lucide.createIcons();
+  }
+}
+
+async function deleteImage(imageId) {
+  if (!confirm(t('confirmDeleteImage') || 'Bu resmi silmek istediğinize emin misiniz?')) return;
+
+  const gallery = (await Storage.load(DB_KEYS.IMAGES)) || [];
+  const newGallery = gallery.filter((img) => img.id !== imageId);
+  await Storage.save(DB_KEYS.IMAGES, newGallery);
+  await loadImageGallery();
+}
+
+// --- MODEL KARŞILAŞTIRMA FONKSİYONLARI ---
+function toggleCompareMode() {
+  compareMode = !compareMode;
+
+  const chatTabContent = document.getElementById('chat-tab-content');
+  const comparePanel = document.getElementById('compare-panel');
+  const compareModeBtn = document.getElementById('compare-mode-btn');
+
+  if (chatTabContent) chatTabContent.classList.toggle('hidden', compareMode);
+  if (comparePanel) comparePanel.classList.toggle('hidden', !compareMode);
+  if (compareModeBtn) compareModeBtn.classList.toggle('text-blue-400', compareMode);
+
+  // Karşılaştırma paneli açıldığında model seçicileri doldur
+  if (compareMode) {
+    populateCompareModelSelectors();
+  }
+}
+
+function populateCompareModelSelectors() {
+  const modelSelector = document.getElementById('model-selector');
+  const compareModel1 = document.getElementById('compare-model-1');
+  const compareModel2 = document.getElementById('compare-model-2');
+
+  if (!modelSelector || !compareModel1 || !compareModel2) return;
+
+  // Ana model seçiciden seçenekleri kopyala
+  const options = modelSelector.innerHTML;
+  compareModel1.innerHTML = options;
+  compareModel2.innerHTML = options;
+
+  // "Model Ekle" seçeneğini kaldır
+  const addOption1 = compareModel1.querySelector('#add-custom-model-option');
+  const addOption2 = compareModel2.querySelector('#add-custom-model-option');
+  if (addOption1) addOption1.remove();
+  if (addOption2) addOption2.remove();
+
+  // Varsayılan olarak farklı modeller seç
+  if (compareModel1.options.length > 0) {
+    compareModel1.selectedIndex = 0;
+  }
+  if (compareModel2.options.length > 1) {
+    compareModel2.selectedIndex = 1;
+  }
+}
+
+async function runComparison() {
+  const input = document.getElementById('compare-input')?.value.trim();
+  if (!input) {
+    alert(t('enterPrompt') || 'Lütfen bir soru girin.');
+    return;
+  }
+
+  const model1 = document.getElementById('compare-model-1')?.value;
+  const model2 = document.getElementById('compare-model-2')?.value;
+
+  const result1 = document.getElementById('compare-result-1');
+  const result2 = document.getElementById('compare-result-2');
+
+  if (!result1 || !result2) return;
+
+  // Loading göster
+  result1.innerHTML = `<div class="animate-pulse text-gray-400">${t('loading') || 'Yükleniyor...'}</div>`;
+  result2.innerHTML = `<div class="animate-pulse text-gray-400">${t('loading') || 'Yükleniyor...'}</div>`;
+
+  try {
+    // Puter SDK kontrolü
+    if (typeof puter === 'undefined' || !puter.ai || !puter.ai.chat) {
+      throw new Error(t('puterApiUnavailable'));
+    }
+
+    // Paralel olarak iki modelden cevap al
+    const [response1, response2] = await Promise.all([
+      puter.ai.chat(input, { model: model1 }),
+      puter.ai.chat(input, { model: model2 }),
+    ]);
+
+    // Sonuçları parse et
+    const content1 = parseAIResponse(response1);
+    const content2 = parseAIResponse(response2);
+
+    // Sonuçları göster
+    result1.innerHTML = `<div class="markdown-body">${marked.parse(content1)}</div>`;
+    result2.innerHTML = `<div class="markdown-body">${marked.parse(content2)}</div>`;
+
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  } catch (err) {
+    logError(err, 'runComparison');
+    result1.innerHTML = `<div class="text-red-400">${t('error') || 'Hata'}: ${err.message}</div>`;
+    result2.innerHTML = `<div class="text-red-400">${t('error') || 'Hata'}: ${err.message}</div>`;
+  }
+}
+
+// --- FARKLI MODELLE YENİDEN OLUŞTUR ---
+async function regenerateWithModel(messageIndex, newModelId) {
+  const chat = chats.find((c) => c.id === activeChatId);
+  if (!chat) return;
+
+  // Kullanıcının orijinal mesajını bul
+  const userMessage = chat.messages[messageIndex - 1];
+  if (!userMessage || userMessage.role !== 'user') return;
+
+  // Yükleniyor durumunu göster
+  const regenerateBtn = document.querySelector(
+    `[data-message-index="${messageIndex}"] .regenerate-btn`
+  );
+  if (regenerateBtn) {
+    regenerateBtn.innerHTML = `<i data-lucide="loader-2" class="w-3 h-3 animate-spin"></i> ${t('regenerating') || 'Yeniden oluşturuluyor...'}`;
+    regenerateBtn.disabled = true;
+  }
+
+  try {
+    // Puter SDK kontrolü
+    if (typeof puter === 'undefined' || !puter.ai || !puter.ai.chat) {
+      throw new Error(t('puterApiUnavailable'));
+    }
+
+    // Yeni modelle cevap al
+    const response = await puter.ai.chat(userMessage.content, { model: newModelId });
+
+    // Sonucu parse et
+    const content = parseAIResponse(response);
+
+    // Mevcut AI cevabını güncelle
+    chat.messages[messageIndex].content = content;
+    chat.messages[messageIndex].model = newModelId;
+    chat.messages[messageIndex].timestamp = Date.now();
+
+    await saveChats();
+    updateChatUI(activeChatId);
+  } catch (err) {
+    logError(err, 'regenerateWithModel');
+    alert(`${t('error') || 'Hata'}: ${err.message}`);
+  }
+}
+
+// --- API YANIT PARSE ---
+function parseAIResponse(response) {
+  let content = '';
+  if (typeof response === 'string') {
+    content = response;
+  } else if (response?.message?.content) {
+    content = response.message.content;
+  } else if (response?.text) {
+    content = response.text;
+  } else if (response?.content) {
+    content = response.content;
+  } else if (response?.choices?.[0]?.message?.content) {
+    content = response.choices[0].message.content;
+  } else if (typeof response === 'object') {
+    content = JSON.stringify(response, null, 2);
+  } else {
+    content = String(response);
+  }
+
+  // Array kontrolü
+  if (Array.isArray(content)) {
+    content = content
+      .map((c) => (typeof c === 'object' ? c.text || JSON.stringify(c) : c))
+      .join('');
+  }
+
+  return content;
+}
+
+// --- TÜM MODELLERİ LİSTELE (Regenerate dropdown için) ---
+function getAllModels() {
+  const modelSelector = document.getElementById('model-selector');
+  if (!modelSelector) return [];
+
+  const models = [];
+  const options = modelSelector.querySelectorAll('option');
+  options.forEach((option) => {
+    if (option.value && option.value !== '__add_custom__') {
+      models.push({
+        id: option.value,
+        name: option.textContent,
+      });
+    }
+  });
+
+  return models;
+}
+
 // --- SEKME DEĞİŞTİRME ---
 function switchTab(tab) {
   activeTab = tab;
 
   const chatTab = document.getElementById('chat-tab-content');
   const imageTab = document.getElementById('image-tab-content');
+  const comparePanel = document.getElementById('compare-panel');
   const chatTabBtn = document.getElementById('chat-tab-btn');
   const imageTabBtn = document.getElementById('image-tab-btn');
+
+  // Karşılaştırma modunu kapat
+  if (compareMode) {
+    compareMode = false;
+    const compareModeBtn = document.getElementById('compare-mode-btn');
+    if (compareModeBtn) compareModeBtn.classList.remove('text-blue-400');
+  }
 
   if (tab === 'chat') {
     chatTab?.classList.remove('hidden');
     imageTab?.classList.add('hidden');
+    comparePanel?.classList.add('hidden');
     chatTabBtn?.classList.add('active', 'border-b-2', 'border-blue-500');
     chatTabBtn?.classList.remove('text-gray-500');
     imageTabBtn?.classList.remove('active', 'border-b-2', 'border-blue-500');
@@ -1320,10 +1626,13 @@ function switchTab(tab) {
   } else {
     chatTab?.classList.add('hidden');
     imageTab?.classList.remove('hidden');
+    comparePanel?.classList.add('hidden');
     imageTabBtn?.classList.add('active', 'border-b-2', 'border-blue-500');
     imageTabBtn?.classList.remove('text-gray-500');
     chatTabBtn?.classList.remove('active', 'border-b-2', 'border-blue-500');
     chatTabBtn?.classList.add('text-gray-500');
+    // Resim galerisini yükle
+    loadImageGallery();
   }
 }
 

@@ -243,7 +243,8 @@ Bu proje [MIT Lisansı](https://opensource.org/licenses/MIT) altında lisanslanm
 **Mustafa-Kayra**
 
 - GitHub: [@Mustafa-Kayra](https://github.com/Mustafa-Kayra)
-NOT: Eğer deploy özelliği çalışmıyorsa yeni sekmeye orada-yazan.puter.site yazın.
+  NOT: Eğer deploy özelliği çalışmıyorsa yeni sekmeye orada-yazan.puter.site yazın.
+
 ---
 
 ## 🙏 Teşekkürler
@@ -251,7 +252,6 @@ NOT: Eğer deploy özelliği çalışmıyorsa yeni sekmeye orada-yazan.puter.sit
 - [Puter](https://puter.com/) - Bulut altyapısı için
 - [OpenRouter](https://openrouter.ai/) - AI model erişimi için
 - Tüm açık kaynak kütüphane geliştiricilerine
-  
 
 ---
 

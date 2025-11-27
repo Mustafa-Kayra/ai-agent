@@ -290,3 +290,56 @@ input:focus-visible {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* --- Karşılaştırma Paneli Stilleri --- */
+#compare-panel {
+  background-color: var(--bg-app);
+}
+
+#compare-result-1,
+#compare-result-2 {
+  min-height: 200px;
+}
+
+#compare-result-1 .markdown-body,
+#compare-result-2 .markdown-body {
+  font-size: 0.9rem;
+}
+
+/* Regenerate with model stili */
+.regenerate-with-model {
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.regenerate-with-model:hover {
+  opacity: 1;
+}
+
+.regenerate-model-select {
+  max-width: 200px;
+  font-size: 11px;
+}
+
+/* Karşılaştırma modu aktif butonu */
+#compare-mode-btn.text-blue-400 {
+  color: #60a5fa;
+  border-bottom: 2px solid #3b52d4;
+}
+
+/* Resim galerisi için delete butonu */
+#image-gallery button {
+  transition: opacity 0.2s;
+}
+
+/* Mobil karşılaştırma paneli */
+@media (max-width: 768px) {
+  #compare-panel .grid {
+    grid-template-columns: 1fr;
+  }
+
+  #compare-result-1,
+  #compare-result-2 {
+    max-height: 300px;
+  }
+}
