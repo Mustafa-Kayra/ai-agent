@@ -221,7 +221,16 @@ const Storage = {
       try {
         const file = await puter.fs.read(key + '.json');
         if (file) {
-          const data = JSON.parse(await file.text());
+          let textContent;
+          // Blob veya File objesi ise text() kullan, string ise direkt kullan
+          if (file instanceof Blob || (file && typeof file.text === 'function')) {
+            textContent = await file.text();
+          } else if (typeof file === 'string') {
+            textContent = file;
+          } else {
+            textContent = JSON.stringify(file);
+          }
+          const data = JSON.parse(textContent);
           // localStorage'a da kaydet (senkronizasyon)
           localStorage.setItem(key, JSON.stringify(data));
           return data;
@@ -413,22 +422,27 @@ Language: ${langName}`;
     console.log('✅ Puter SDK hazır, AI çağrısı yapılıyor...');
 
     // API Çağrısı - Hata yönetimi ile
-    try {
-      // Görsel/Video dosyası varsa vision API kullan
-      if (uploadedFile && uploadedFile.base64) {
-        const messages = [
-          { type: 'text', text: fullPrompt },
-          {
-            type: 'image',
-            source: {
-              type: 'base64',
-              media_type: uploadedFile.type,
-              data: uploadedFile.base64,
-            },
+    let isVisionRequest = uploadedFile && uploadedFile.base64;
+    let visionMessages = null;
+
+    if (isVisionRequest) {
+      visionMessages = [
+        { type: 'text', text: fullPrompt },
+        {
+          type: 'image',
+          source: {
+            type: 'base64',
+            media_type: uploadedFile.type,
+            data: uploadedFile.base64,
           },
-        ];
+        },
+      ];
+    }
+
+    try {
+      if (isVisionRequest) {
         console.log('📷 Vision API çağrılıyor...');
-        response = await puter.ai.chat(messages, { model: modelId });
+        response = await puter.ai.chat(visionMessages, { model: modelId });
         console.log('✅ Vision API yanıt aldı:', response);
 
         // Dosyayı temizle
@@ -451,11 +465,21 @@ Language: ${langName}`;
 
         // Fallback: Native gpt-4o modeli dene
         try {
-          response = await puter.ai.chat(fullPrompt, { model: 'gpt-4o' });
+          if (isVisionRequest && visionMessages) {
+            response = await puter.ai.chat(visionMessages, { model: 'gpt-4o' });
+            clearUploadedFile();
+          } else {
+            response = await puter.ai.chat(fullPrompt, { model: 'gpt-4o' });
+          }
         } catch (fallbackError) {
           // gpt-4o da başarısız olduysa claude-sonnet-4 dene
           console.warn('gpt-4o başarısız, claude-sonnet-4 deneniyor...');
-          response = await puter.ai.chat(fullPrompt, { model: 'claude-sonnet-4' });
+          if (isVisionRequest && visionMessages) {
+            response = await puter.ai.chat(visionMessages, { model: 'claude-sonnet-4' });
+            clearUploadedFile();
+          } else {
+            response = await puter.ai.chat(fullPrompt, { model: 'claude-sonnet-4' });
+          }
         }
       } else {
         throw apiError; // Diğer hataları yukarı fırlat
