@@ -249,6 +249,13 @@ async function initUser() {
         isUserSignedIn = true;
         document.getElementById('username').innerText = user.username;
         document.getElementById('user-avatar').innerText = user.username.charAt(0).toUpperCase();
+
+        // Auth butonunu gizle
+        const authBtnParent = document.querySelector('#auth-btn-text')?.parentElement;
+        if (authBtnParent) {
+          authBtnParent.style.display = 'none';
+        }
+
         await loadChats();
       }
     }
@@ -692,16 +699,71 @@ function setMode(mode, updateChat = true) {
 
 // --- YARDIMCI FONKSİYONLAR ---
 async function handleAuth() {
+  const authBtn = document.getElementById('auth-btn-text');
+  const originalText = authBtn ? authBtn.innerText : '';
+
   try {
-    if (typeof puter !== 'undefined') {
-      const user = await puter.auth.signIn();
+    // Puter SDK'nın yüklenmesini bekle
+    if (typeof puter === 'undefined') {
+      if (authBtn) authBtn.innerText = 'Loading SDK...';
+
+      // 5 saniye bekle
+      let attempts = 0;
+      while (typeof puter === 'undefined' && attempts < 50) {
+        await new Promise((r) => setTimeout(r, 100));
+        attempts++;
+      }
+
+      if (typeof puter === 'undefined') {
+        alert('Puter SDK yüklenemedi. Lütfen sayfayı yenileyin.');
+        if (authBtn) authBtn.innerText = originalText;
+        return;
+      }
+    }
+
+    // Loading göster
+    if (authBtn) {
+      authBtn.innerText = 'Signing in...';
+    }
+
+    const user = await puter.auth.signIn();
+
+    if (user && user.username) {
       isUserSignedIn = true;
       document.getElementById('username').innerText = user.username;
       document.getElementById('user-avatar').innerText = user.username.charAt(0).toUpperCase();
+
+      // Auth butonunu gizle
+      const authBtnParent = document.querySelector('#auth-btn-text').parentElement;
+      if (authBtnParent) {
+        authBtnParent.style.display = 'none';
+      }
+
+      // Sohbetleri yükle
       await loadChats();
+
+      // UI'ı güncelle
+      if (chats.length > 0) {
+        loadChatToUI(chats[0].id);
+      }
+    } else {
+      throw new Error('Kullanıcı bilgisi alınamadı');
     }
   } catch (e) {
     logError(e, 'handleAuth');
+
+    // Kullanıcıya hata göster
+    if (authBtn) {
+      authBtn.innerText = originalText;
+    }
+
+    // Hata detayına göre mesaj
+    const errorMsg =
+      e.message === 'User cancelled sign-in'
+        ? 'Giriş iptal edildi.'
+        : 'Giriş yapılamadı. Lütfen tekrar deneyin.';
+
+    alert(errorMsg);
   }
 }
 
