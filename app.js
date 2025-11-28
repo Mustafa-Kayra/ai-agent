@@ -388,16 +388,20 @@ Language: ${langName}`;
     // Görsel/Video dosyası varsa vision API kullan
     if (uploadedFile && uploadedFile.base64) {
       const messages = [
-        { type: 'text', text: fullPrompt },
         {
-          type: 'image',
-          source: {
-            type: 'base64',
-            media_type: uploadedFile.type,
-            data: uploadedFile.base64,
-          },
+          role: 'user',
+          content: [
+            { type: 'text', text: fullPrompt },
+            {
+              type: 'image_url',
+              image_url: {
+                url: `data:${uploadedFile.type};base64,${uploadedFile.base64}`,
+              },
+            },
+          ],
         },
       ];
+
       console.log('📷 Vision API çağrılıyor...');
       response = await puter.ai.chat(messages, { model: modelId });
       console.log('✅ Vision API yanıt aldı:', response);
