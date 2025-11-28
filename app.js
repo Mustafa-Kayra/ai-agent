@@ -33,7 +33,6 @@ if (typeof window.supabase !== 'undefined') {
 // --- STATE DEĞİŞKENLERİ ---
 let chats = [];
 let activeChatId = null;
-let isUserSignedIn = false;
 let currentLanguage = 'tr'; // Varsayılan dil
 let currentStyle = 'normal'; // Varsayılan konuşma stili
 let customStylePrompt = ''; // Özel stil prompt'u
@@ -41,6 +40,11 @@ let customModels = []; // Kullanıcının eklediği özel modeller
 let uploadedFile = null; // Yüklenen dosya (görsel/video)
 let activeTab = 'chat'; // 'chat' veya 'image-gen'
 let compareMode = false; // Karşılaştırma modu
+
+// --- PUTER STATE DEĞİŞKENLERİ (Anti-Freeze) ---
+let puterReady = false; // Puter SDK yüklendi mi?
+let isUserSignedIn = false; // Kullanıcı giriş yapmış mı?
+let useCloudStorage = false; // puter.kv/fs çalışıyor mu?
 
 // --- DİL DESTEĞİ ---
 // LANGUAGES ve UI_TRANSLATIONS artık languages.js dosyasında tanımlıdır
@@ -184,59 +188,71 @@ const DB_KEYS = {
   STATS: 'stats',
 };
 
-// --- OPTİMİZASYON: Puter.kv ile Storage ---
+// --- HİBRİT STORAGE SİSTEMİ (Cloud + LocalStorage) ---
 const Storage = {
-  // Puter.kv kullan, başarısız olursa localStorage fallback
+  // Kaydet: Önce localStorage (hızlı), sonra cloud (sync)
   async save(key, data) {
-    if (typeof puter !== 'undefined' && puter.kv) {
+    const jsonData = JSON.stringify(data);
+
+    // 1. Her zaman localStorage'a kaydet (hızlı ve güvenilir)
+    try {
+      localStorage.setItem(key, jsonData);
+    } catch (e) {
+      console.warn('localStorage kaydetme hatası:', e);
+    }
+
+    // 2. Cloud storage aktifse arka planda sync et
+    if (useCloudStorage && isUserSignedIn) {
       try {
-        await puter.kv.set(key, JSON.stringify(data));
-        return true;
+        await puter.kv.set(key, jsonData);
+        console.log("☁️ Cloud'a kaydedildi:", key);
       } catch (e) {
-        console.warn('Puter.kv başarısız, localStorage fallback');
+        // Cloud başarısız olursa sessizce devam et
+        console.warn("Cloud kaydetme başarısız (localStorage'da mevcut):", e);
       }
     }
-    // LocalStorage fallback
-    try {
-      localStorage.setItem(key, JSON.stringify(data));
-      return true;
-    } catch (e) {
-      console.warn('LocalStorage kaydetme başarısız:', e);
-      return false;
-    }
+
+    return true;
   },
 
+  // Yükle: Önce cloud (güncel), yoksa localStorage
   async load(key) {
-    if (typeof puter !== 'undefined' && puter.kv) {
+    // 1. Cloud storage aktifse oradan oku (en güncel veri)
+    if (useCloudStorage && isUserSignedIn) {
       try {
-        const data = await puter.kv.get(key);
-        if (data) return JSON.parse(data);
+        const cloudData = await puter.kv.get(key);
+        if (cloudData) {
+          const parsed = JSON.parse(cloudData);
+          // localStorage'ı da güncelle (offline erişim için)
+          localStorage.setItem(key, cloudData);
+          return parsed;
+        }
       } catch (e) {
-        console.warn('Puter.kv okuma başarısız, localStorage fallback');
+        console.warn("Cloud okuma hatası, localStorage'a düşülüyor:", e);
       }
     }
-    // LocalStorage fallback
+
+    // 2. localStorage'dan oku
     try {
-      const data = localStorage.getItem(key);
-      return data ? JSON.parse(data) : null;
+      const localData = localStorage.getItem(key);
+      if (localData) return JSON.parse(localData);
     } catch (e) {
-      console.warn('LocalStorage okuma başarısız:', e);
-      return null;
+      console.warn('localStorage okuma hatası:', e);
     }
+
+    return null;
   },
 
+  // Sil
   async delete(key) {
-    if (typeof puter !== 'undefined' && puter.kv) {
+    localStorage.removeItem(key);
+
+    if (useCloudStorage && isUserSignedIn) {
       try {
         await puter.kv.del(key);
       } catch (e) {
-        console.warn('Puter.kv silme başarısız');
+        // Silme hatası sessizce devam et
       }
-    }
-    try {
-      localStorage.removeItem(key);
-    } catch (e) {
-      console.warn('LocalStorage silme başarısız:', e);
     }
   },
 };
@@ -252,12 +268,172 @@ function logError(error, context = '') {
   // Production'da sessiz hata yönetimi - isteğe bağlı hata raporlama eklenebilir
 }
 
+// --- AKILLI PUTER BAŞLATMA (Anti-Freeze) ---
+// Puter SDK'yı güvenli başlat - ASLA takılmayacak
+async function initPuter() {
+  return new Promise((resolve) => {
+    // 3 saniye timeout - takılmayı önle
+    const timeout = setTimeout(() => {
+      console.warn('⚠️ Puter SDK yüklenemedi, Misafir Modu aktif');
+      puterReady = false;
+      resolve(false);
+    }, 3000);
+
+    // Puter SDK kontrolü
+    if (typeof puter !== 'undefined') {
+      clearTimeout(timeout);
+      puterReady = true;
+      console.log('✅ Puter SDK hazır');
+
+      // Mevcut oturum var mı kontrol et
+      checkExistingSession().then(resolve);
+    } else {
+      // SDK henüz yüklenmemiş, bekle
+      const checkInterval = setInterval(() => {
+        if (typeof puter !== 'undefined') {
+          clearInterval(checkInterval);
+          clearTimeout(timeout);
+          puterReady = true;
+          console.log('✅ Puter SDK hazır');
+          checkExistingSession().then(resolve);
+        }
+      }, 100);
+    }
+  });
+}
+
+// Mevcut oturumu kontrol et
+async function checkExistingSession() {
+  try {
+    if (puterReady && puter.auth && puter.auth.isSignedIn) {
+      const signedIn = await puter.auth.isSignedIn();
+      if (signedIn) {
+        const user = await puter.auth.getUser();
+        if (user) {
+          isUserSignedIn = true;
+          updateUserUI(user.username);
+          await testCloudStorage(); // Cloud storage çalışıyor mu test et
+          console.log('✅ Oturum aktif:', user.username);
+          return true;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('Oturum kontrolü başarısız:', e);
+  }
+  return false;
+}
+
+// Cloud storage test et
+async function testCloudStorage() {
+  try {
+    // Basit bir test yaz/oku
+    await puter.kv.set('_test_', '1');
+    await puter.kv.del('_test_');
+    useCloudStorage = true;
+    console.log('✅ Cloud Storage (puter.kv) aktif');
+  } catch (e) {
+    console.warn('⚠️ Cloud Storage kullanılamıyor, localStorage kullanılacak');
+    useCloudStorage = false;
+  }
+}
+
+// Kullanıcı arayüzünü güncelle
+function updateUserUI(username) {
+  const usernameEl = document.getElementById('username');
+  const avatarEl = document.getElementById('user-avatar');
+  const authBtn = document.querySelector('#auth-btn-text')?.parentElement;
+
+  if (usernameEl) usernameEl.innerText = username || 'Kullanıcı';
+  if (avatarEl) avatarEl.innerText = (username || 'U').charAt(0).toUpperCase();
+  if (authBtn) authBtn.innerHTML = '<span class="text-green-400 text-xs">✓ ' + username + '</span>';
+}
+
+// --- AKILLI AI ÇAĞRISI (Hata Olursa Giriş İste) ---
+async function callAI(prompt, options = {}) {
+  const modelId = options.model || document.getElementById('model-selector')?.value || 'gpt-4o';
+
+  // Puter hazır değilse hata
+  if (!puterReady || typeof puter === 'undefined') {
+    throw new Error('Puter SDK yüklenemedi. Sayfayı yenileyin.');
+  }
+
+  try {
+    // İlk deneme - Anonim olarak dene (giriş gerektirmez)
+    const response = await puter.ai.chat(prompt, { model: modelId });
+    return response;
+  } catch (error) {
+    console.warn('AI çağrısı başarısız:', error);
+
+    // Permission/Auth hatası mı?
+    const isAuthError =
+      error.status === 401 ||
+      error.status === 403 ||
+      error.message?.includes('Permission denied') ||
+      error.message?.includes('Unauthorized') ||
+      error.message?.includes('usage-limited') ||
+      error.message?.includes('sign in');
+
+    if (isAuthError && !isUserSignedIn) {
+      // Kullanıcıya giriş yapmasını iste
+      const shouldLogin = confirm(
+        '🔐 Bu model için giriş yapmanız gerekiyor.\n\n' + 'Giriş yapmak ister misiniz?'
+      );
+
+      if (shouldLogin) {
+        try {
+          // Puter giriş penceresini aç
+          const user = await puter.auth.signIn();
+          if (user) {
+            isUserSignedIn = true;
+            updateUserUI(user.username);
+            await testCloudStorage();
+
+            // Tekrar dene
+            console.log('✅ Giriş yapıldı, tekrar deneniyor...');
+            return await puter.ai.chat(prompt, { model: modelId });
+          }
+        } catch (loginError) {
+          console.error('Giriş hatası:', loginError);
+        }
+      }
+
+      // Giriş yapılmadı/başarısız - Alternatif model dene
+      console.warn('Giriş yapılmadı, ücretsiz model deneniyor...');
+      try {
+        return await puter.ai.chat(prompt, { model: 'gpt-4o' });
+      } catch (e2) {
+        try {
+          return await puter.ai.chat(prompt, { model: 'claude-sonnet-4' });
+        } catch (e3) {
+          throw new Error('AI servisi şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.');
+        }
+      }
+    }
+
+    // Model hatası - Alternatif dene
+    if (error.message?.includes('model') || error.status === 400) {
+      console.warn('Model hatası, alternatif deneniyor...');
+      try {
+        return await puter.ai.chat(prompt, { model: 'gpt-4o' });
+      } catch (e) {
+        return await puter.ai.chat(prompt, { model: 'claude-sonnet-4' });
+      }
+    }
+
+    throw error;
+  }
+}
+
 // --- INIT ---
-function initApp() {
+async function initApp() {
   // Lucide ikonlarını başlat
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
+
+  // Puter SDK'yı başlat (3 saniye timeout ile)
+  await initPuter();
 
   // Intersection Observer'ı başlat
   initIntersectionObserver();
@@ -272,16 +448,21 @@ function initApp() {
   setupEventListeners();
 
   // Kullanıcı durumunu kontrol et ve sohbetleri yükle
-  initUser();
+  await initUser();
 
   // Arayüzü seçilen dile göre güncelle
   updateUILanguage();
+
+  // UI başlangıç durumu
+  console.log('🚀 AI Agent hazır!');
+  console.log('   - Puter:', puterReady ? '✅' : '❌');
+  console.log('   - Oturum:', isUserSignedIn ? '✅' : '❌ (Misafir)');
+  console.log('   - Cloud Storage:', useCloudStorage ? '✅' : '❌ (localStorage)');
 }
 
 async function initUser() {
   try {
-    // Demo mode - skip Puter auth completely
-    // User will click "Sign in" button to activate demo mode
+    // Sohbetleri yükle (localStorage veya cloud)
     await loadChats();
   } catch (e) {
     logError(e, 'initUser');
@@ -376,11 +557,11 @@ Language: ${langName}`;
     console.log('🚀 API çağrısı başlatılıyor...', { modelId, hasFile: !!uploadedFile });
 
     // Puter SDK kontrolü
-    if (typeof puter === 'undefined') {
-      throw new Error('Puter SDK yüklenmedi. Lütfen sayfayı yenileyin.');
+    if (!puterReady || typeof puter === 'undefined') {
+      throw new Error('Puter SDK yüklenemedi. Sayfayı yenileyin.');
     }
     if (!puter.ai || !puter.ai.chat) {
-      throw new Error('Puter AI servisi kullanılamıyor. Giriş yapmanız gerekebilir.');
+      throw new Error('Puter AI servisi kullanılamıyor.');
     }
 
     console.log('✅ Puter SDK hazır, AI çağrısı yapılıyor...');
@@ -399,14 +580,14 @@ Language: ${langName}`;
         },
       ];
       console.log('📷 Vision API çağrılıyor...');
-      response = await puter.ai.chat(messages, { model: modelId });
+      response = await callAI(messages, { model: modelId });
       console.log('✅ Vision API yanıt aldı:', response);
 
       // Dosyayı temizle
       clearUploadedFile();
     } else {
       console.log('💬 Chat API çağrılıyor...');
-      response = await puter.ai.chat(fullPrompt, { model: modelId });
+      response = await callAI(fullPrompt, { model: modelId });
       console.log('✅ Chat API yanıt aldı:', response);
     }
 
@@ -766,25 +947,53 @@ function setMode(mode, updateChat = true) {
 
 // --- YARDIMCI FONKSİYONLAR ---
 async function handleAuth() {
-  // Demo Mode - No authentication required
-  const demoUsername = 'Demo User';
-
-  isUserSignedIn = true;
-  document.getElementById('username').innerText = demoUsername;
-  document.getElementById('user-avatar').innerText = demoUsername.charAt(0).toUpperCase();
-
-  const authBtnParent = document.querySelector('#auth-btn-text')?.parentElement;
-  if (authBtnParent) {
-    authBtnParent.style.display = 'none';
+  if (!puterReady) {
+    alert('Puter servisi yüklenemedi. Sayfayı yenileyin.');
+    return;
   }
 
-  await loadChats();
+  try {
+    if (isUserSignedIn) {
+      // Zaten giriş yapmış - çıkış yap
+      await puter.auth.signOut();
+      isUserSignedIn = false;
+      useCloudStorage = false;
 
-  if (chats.length > 0) {
-    loadChatToUI(chats[0].id);
+      document.getElementById('username').innerText = 'Misafir';
+      document.getElementById('user-avatar').innerText = 'M';
+      const authBtn = document.querySelector('#auth-btn-text')?.parentElement;
+      if (authBtn) {
+        authBtn.innerHTML =
+          '<i data-lucide="log-in" class="w-4 h-4"></i><span id="auth-btn-text">Giriş Yap</span>';
+      }
+
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
+      console.log('👋 Çıkış yapıldı');
+    } else {
+      // Giriş yap
+      const user = await puter.auth.signIn();
+      if (user) {
+        isUserSignedIn = true;
+        updateUserUI(user.username);
+        await testCloudStorage();
+
+        // Cloud'dan sohbetleri yükle
+        await loadChats();
+        if (chats.length > 0) {
+          loadChatToUI(chats[0].id);
+        }
+
+        console.log('✅ Giriş yapıldı:', user.username);
+      }
+    }
+  } catch (e) {
+    if (!e.message?.includes('cancelled')) {
+      console.error('Auth hatası:', e);
+      alert('Giriş yapılamadı: ' + (e.message || 'Bilinmeyen hata'));
+    }
   }
-
-  console.log('✅ Demo mode - authentication bypassed');
 }
 
 async function saveChats() {
