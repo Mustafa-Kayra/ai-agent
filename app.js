@@ -323,33 +323,26 @@ async function handleSendClick() {
 
   try {
     // --- CANLI DÜŞÜNME SİMÜLASYONU (TÜM MODLAR) ---
-    // Her mod için tanımlı adımları (steps) tek tek oynatıyoruz
     for (const step of modeConfig.steps) {
       if (!currentChat.isProcessing) break;
 
       currentChat.tempStatus = step;
       currentChat.processLog.push({ text: step, done: false }); // İlerlemeyi logla
 
-      // Aktif sohbette UI güncelle
       if (activeChatId === chatId) updateThinkingUI(chatId);
 
-      // Gerçekçilik için rastgele gecikme (DeepSearch daha yavaş)
       const delay = modeKey === 'deepsearch' ? 1500 : 600;
       await new Promise((r) => setTimeout(r, delay + Math.random() * 500));
 
-      // Son adımı tamamlandı olarak işaretle
       if (currentChat.processLog.length > 0) {
         currentChat.processLog[currentChat.processLog.length - 1].done = true;
       }
     }
 
     // Dil ve stil prompt'larını oluştur
-    // Dil promptu hedef dile özgü olmalı, böylece model doğru dili kullanır
     let langPrompt = '';
     if (LANGUAGES[currentLanguage]) {
       const langName = LANGUAGES[currentLanguage].prompt;
-      // Prompt'u İngilizce olarak yaz, model daha iyi anlar
-      // CRITICAL: Dili zorla
       langPrompt = `🔴 CRITICAL INSTRUCTION - HIGHEST PRIORITY 🔴
 You MUST respond ENTIRELY and EXCLUSIVELY in ${langName} language.
 - Every single word, sentence, and paragraph MUST be in ${langName}
@@ -385,6 +378,7 @@ Language: ${langName}`;
 
     console.log('✅ Puter SDK hazır, AI çağrısı yapılıyor...');
 
+    // --- DÜZELTİLMİŞ VISION API BLOĞU ---
     // Görsel/Video dosyası varsa vision API kullan
     if (uploadedFile && uploadedFile.base64) {
       const messages = [
@@ -413,34 +407,26 @@ Language: ${langName}`;
       response = await puter.ai.chat(fullPrompt, { model: modelId });
       console.log('✅ Chat API yanıt aldı:', response);
     }
+    // --- DÜZELTME SONU ---
 
-    // --- HATA DÜZELTMESİ: API Yanıt Parsing ---
-    // Puter.js API yanıtını doğru şekilde parse et
+    // --- API Yanıt Parsing ---
     let content = '';
     if (typeof response === 'string') {
-      // Doğrudan string yanıt
       content = response;
     } else if (response?.message?.content) {
-      // response.message.content formatı
       content = response.message.content;
     } else if (response?.text) {
-      // response.text formatı
       content = response.text;
     } else if (response?.content) {
-      // response.content formatı
       content = response.content;
     } else if (response?.choices?.[0]?.message?.content) {
-      // OpenAI formatı: response.choices[0].message.content
       content = response.choices[0].message.content;
     } else if (typeof response === 'object') {
-      // Bilinmeyen obje formatı - JSON olarak göster
       content = JSON.stringify(response, null, 2);
     } else {
-      // Son çare - string'e çevir
       content = String(response);
     }
 
-    // Array kontrolü - bazı API'ler array döndürebilir
     if (Array.isArray(content)) {
       content = content
         .map((c) => (typeof c === 'object' ? c.text || JSON.stringify(c) : c))
@@ -570,8 +556,7 @@ function updateChatUI(chatId) {
             <div class="max-w-[85%] min-w-0">
                 <div class="p-0 rounded-2xl">
                     <div class="thinking-process rounded-lg border border-[#2f3345] bg-[#151722] p-3 shadow-inner" id="thinking-steps-container">
-                        <!-- Adımlar JS ile eklenir -->
-                    </div>
+                        </div>
                 </div>
             </div>
         `;
@@ -769,6 +754,7 @@ function setMode(mode, updateChat = true) {
 }
 
 // --- YARDIMCI FONKSİYONLAR ---
+// --- GERÇEK AUTH FONKSİYONU ---
 async function handleAuth() {
   try {
     // Puter ile GERÇEK giriş yapma penceresini açar
@@ -809,6 +795,7 @@ async function loadChats() {
   }
 }
 
+// --- DEPLOY FONKSİYONLARI ---
 async function deployCode(btn) {
   if (!isUserSignedIn) {
     handleAuth();
@@ -843,7 +830,6 @@ async function deployCode(btn) {
     const finalSubdomain = site.subdomain || subdomain;
     const url = `https://${finalSubdomain}.puter.site`;
 
-    // ... (devamı aynen kalıyor)
     btn.className =
       'text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg flex items-center gap-2 transition-colors';
     btn.innerHTML = `<i data-lucide="external-link" class="w-3 h-3"></i> ${finalSubdomain}`;
@@ -855,15 +841,15 @@ async function deployCode(btn) {
   } catch (err) {
     logError(err, 'deployCode');
     btn.innerHTML = `⚠️ Hata`;
-    console.error('(gerek var mı deploy etmeye zaten puter js nin bedava deploy özelliği var)Deploy Hatası Detayı:', err);
+    console.error('Deploy Hatası Detayı:', err);
 
-setTimeout(() => {
+    setTimeout(() => {
       btn.innerHTML = originalHtml;
       btn.className = originalClass; // Orijinal class'a dön
       btn.disabled = false;
     }, 3000);
   }
-}
+
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
