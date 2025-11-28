@@ -87,13 +87,13 @@ const CONVERSATION_STYLES = {
 const MODES = {
   general: {
     title: 'Genel Sohbet',
-    system: 'Sen zeki bir asistansın. Kısa ve öz cevaplar ver.',
+    system: 'Sen zeki bir asistansın. Kısa ve öz cevaplar ver. Kullanıcının isteğine göre farklı dillerde cevap ver, ama otomatik olarak Türkçe konuş.',
     steps: ['Mesaj inceleniyor...', 'Bağlam kuruluyor...', 'Cevap üretiliyor...'],
   },
   deepsearch: {
     title: 'Deep Search',
     system:
-      'Sen derinlemesine araştırma yapan bir analistsin. Cevaplarında mutlaka kaynak belirt. Konuyu her açıdan ele al.',
+      'Sen derinlemesine araştırma yapan bir analistsin. Cevaplarında mutlaka kaynak belirt. Konuyu her açıdan ele al. Kullanıcıya zeki ve biraz bilmiş şekilde cevap ver.',
     steps: [
       'Sorgu analiz ediliyor...',
       'Web kaynakları taranıyor (Google & Scholar)...',
@@ -104,7 +104,7 @@ const MODES = {
   },
   coding: {
     title: 'Kodlama',
-    system: `Sen Expert Senior Developer'sın. Kod istenirse MUTLAKA 3 AYRI KOD BLOĞU olarak ver:
+    system: `Sen Expert Senior Developer'sın. Mühendis insanlar seni görünce mesleğimiz bitti diyecek kadar iyi kod yaz, kullanıcının isteğinin dışına çıkma. Kod istenirse 3 AYRI KOD BLOĞU olarak ver:
 
 1. HTML bloğu (\`\`\`html ... \`\`\`) - Temel yapı, CSS ve JS dosyalarına link içermeli:
    <link rel="stylesheet" href="styles.css">
@@ -114,7 +114,7 @@ const MODES = {
 
 3. JavaScript bloğu (\`\`\`javascript ... \`\`\`) - Tüm fonksiyonlar
 
-Her zaman bu 3 ayrı blok formatını kullan. Tek dosya HTML verme.`,
+Otomatik olarak tek html dosyası oluştur, ama kullanıcının isteğine göre css, js ve html bulunan üç dosyalı web uygulaması yap. Kullanıcının isteğine göre farklı dillerde (örneğin python, c++) kod yazabilirsin ama tek dosyalı olacak.`,
     steps: [
       'Gereksinimler analiz ediliyor...',
       'Mimari tasarlanıyor...',
@@ -126,7 +126,7 @@ Her zaman bu 3 ayrı blok formatını kullan. Tek dosya HTML verme.`,
   },
   teacher: {
     title: 'Öğretmen',
-    system: 'Sen Sokratik bir öğretmensin. Cevabı direkt verme, sorularla yönlendir. Basit anlat.',
+    system: 'Sen Sokratik bir öğretmensin. Cevabı direkt verme, sorularla yönlendir. Basit anlat. Karşındaki öğrenciymiş gibi konuş.',
     steps: [
       'Öğrenme seviyesi belirleniyor...',
       'Pedagojik yaklaşım seçiliyor...',
@@ -767,7 +767,7 @@ function setMode(mode, updateChat = true) {
 // --- YARDIMCI FONKSİYONLAR ---
 async function handleAuth() {
   // Demo Mode - No authentication required
-  const demoUsername = 'Demo User';
+  const demoUsername = 'Giriş Yapmalısın ama sen bilirsin';
 
   isUserSignedIn = true;
   document.getElementById('username').innerText = demoUsername;
@@ -844,7 +844,7 @@ async function deployCode(btn) {
   } catch (err) {
     logError(err, 'deployCode');
     btn.innerHTML = `⚠️ Hata`;
-    console.error('Deploy Hatası Detayı:', err);
+    console.error('(gerek var mı deploy etmeye zaten puter js nin bedava deploy özelliği var)Deploy Hatası Detayı:', err);
 
     setTimeout(() => {
       btn.innerHTML = originalHtml;
