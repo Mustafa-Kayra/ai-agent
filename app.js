@@ -46,6 +46,9 @@ let puterReady = false; // Puter SDK yüklendi mi?
 let isUserSignedIn = false; // Kullanıcı giriş yapmış mı?
 let useCloudStorage = false; // puter.kv/fs çalışıyor mu?
 
+// Fallback modeller - auth hatası veya model hatası durumunda kullanılır
+const FALLBACK_MODELS = ['gpt-4o', 'claude-sonnet-4'];
+
 // --- DİL DESTEĞİ ---
 // LANGUAGES ve UI_TRANSLATIONS artık languages.js dosyasında tanımlıdır
 
@@ -251,7 +254,7 @@ const Storage = {
       try {
         await puter.kv.del(key);
       } catch (e) {
-        // Silme hatası sessizce devam et
+        console.warn('Cloud storage silme hatası:', e.message || e);
       }
     }
   },
@@ -288,7 +291,7 @@ async function initPuter() {
       // Mevcut oturum var mı kontrol et
       checkExistingSession().then(resolve);
     } else {
-      // SDK henüz yüklenmemiş, bekle
+      // SDK henüz yüklenmemiş, bekle (300ms interval - performans optimizasyonu)
       const checkInterval = setInterval(() => {
         if (typeof puter !== 'undefined') {
           clearInterval(checkInterval);
@@ -297,7 +300,7 @@ async function initPuter() {
           console.log('✅ Puter SDK hazır');
           checkExistingSession().then(resolve);
         }
-      }, 100);
+      }, 300);
     }
   });
 }
@@ -327,9 +330,10 @@ async function checkExistingSession() {
 // Cloud storage test et
 async function testCloudStorage() {
   try {
-    // Basit bir test yaz/oku
-    await puter.kv.set('_test_', '1');
-    await puter.kv.del('_test_');
+    // Basit bir test yaz/oku (benzersiz test anahtarı)
+    const testKey = '__puter_storage_test_' + Date.now() + '__';
+    await puter.kv.set(testKey, '1');
+    await puter.kv.del(testKey);
     useCloudStorage = true;
     console.log('✅ Cloud Storage (puter.kv) aktif');
   } catch (e) {
@@ -398,15 +402,15 @@ async function callAI(prompt, options = {}) {
         }
       }
 
-      // Giriş yapılmadı/başarısız - Alternatif model dene
+      // Giriş yapılmadı/başarısız - Alternatif modelleri dene
       console.warn('Giriş yapılmadı, ücretsiz model deneniyor...');
-      try {
-        return await puter.ai.chat(prompt, { model: 'gpt-4o' });
-      } catch (e2) {
+      for (let i = 0; i < FALLBACK_MODELS.length; i++) {
         try {
-          return await puter.ai.chat(prompt, { model: 'claude-sonnet-4' });
-        } catch (e3) {
-          throw new Error('AI servisi şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.');
+          return await puter.ai.chat(prompt, { model: FALLBACK_MODELS[i] });
+        } catch (fallbackError) {
+          if (i === FALLBACK_MODELS.length - 1) {
+            throw new Error('AI servisi şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.');
+          }
         }
       }
     }
@@ -414,10 +418,14 @@ async function callAI(prompt, options = {}) {
     // Model hatası - Alternatif dene
     if (error.message?.includes('model') || error.status === 400) {
       console.warn('Model hatası, alternatif deneniyor...');
-      try {
-        return await puter.ai.chat(prompt, { model: 'gpt-4o' });
-      } catch (e) {
-        return await puter.ai.chat(prompt, { model: 'claude-sonnet-4' });
+      for (let i = 0; i < FALLBACK_MODELS.length; i++) {
+        try {
+          return await puter.ai.chat(prompt, { model: FALLBACK_MODELS[i] });
+        } catch (fallbackError) {
+          if (i === FALLBACK_MODELS.length - 1) {
+            throw fallbackError;
+          }
+        }
       }
     }
 
