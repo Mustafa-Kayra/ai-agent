@@ -275,8 +275,14 @@ function logError(error, context = '') {
 // Puter SDK'yı güvenli başlat - ASLA takılmayacak
 async function initPuter() {
   return new Promise((resolve) => {
+    let checkInterval = null;
+
     // 3 saniye timeout - takılmayı önle
     const timeout = setTimeout(() => {
+      // Interval'i temizle (memory leak önleme)
+      if (checkInterval) {
+        clearInterval(checkInterval);
+      }
       console.warn('⚠️ Puter SDK yüklenemedi, Misafir Modu aktif');
       puterReady = false;
       resolve(false);
@@ -292,7 +298,7 @@ async function initPuter() {
       checkExistingSession().then(resolve);
     } else {
       // SDK henüz yüklenmemiş, bekle (300ms interval - performans optimizasyonu)
-      const checkInterval = setInterval(() => {
+      checkInterval = setInterval(() => {
         if (typeof puter !== 'undefined') {
           clearInterval(checkInterval);
           clearTimeout(timeout);
@@ -353,6 +359,21 @@ function updateUserUI(username) {
   if (authBtn) authBtn.innerHTML = '<span class="text-green-400 text-xs">✓ ' + username + '</span>';
 }
 
+// Alternatif modelleri dene (yardımcı fonksiyon)
+async function tryFallbackModels(prompt, errorMessage = null) {
+  for (let i = 0; i < FALLBACK_MODELS.length; i++) {
+    try {
+      return await puter.ai.chat(prompt, { model: FALLBACK_MODELS[i] });
+    } catch (fallbackError) {
+      if (i === FALLBACK_MODELS.length - 1) {
+        throw new Error(
+          errorMessage || 'AI servisi şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.'
+        );
+      }
+    }
+  }
+}
+
 // --- AKILLI AI ÇAĞRISI (Hata Olursa Giriş İste) ---
 async function callAI(prompt, options = {}) {
   const modelId = options.model || document.getElementById('model-selector')?.value || 'gpt-4o';
@@ -404,29 +425,13 @@ async function callAI(prompt, options = {}) {
 
       // Giriş yapılmadı/başarısız - Alternatif modelleri dene
       console.warn('Giriş yapılmadı, ücretsiz model deneniyor...');
-      for (let i = 0; i < FALLBACK_MODELS.length; i++) {
-        try {
-          return await puter.ai.chat(prompt, { model: FALLBACK_MODELS[i] });
-        } catch (fallbackError) {
-          if (i === FALLBACK_MODELS.length - 1) {
-            throw new Error('AI servisi şu anda kullanılamıyor. Lütfen daha sonra tekrar deneyin.');
-          }
-        }
-      }
+      return await tryFallbackModels(prompt);
     }
 
     // Model hatası - Alternatif dene
     if (error.message?.includes('model') || error.status === 400) {
       console.warn('Model hatası, alternatif deneniyor...');
-      for (let i = 0; i < FALLBACK_MODELS.length; i++) {
-        try {
-          return await puter.ai.chat(prompt, { model: FALLBACK_MODELS[i] });
-        } catch (fallbackError) {
-          if (i === FALLBACK_MODELS.length - 1) {
-            throw fallbackError;
-          }
-        }
-      }
+      return await tryFallbackModels(prompt, error.message);
     }
 
     throw error;
