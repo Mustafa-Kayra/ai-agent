@@ -770,25 +770,31 @@ function setMode(mode, updateChat = true) {
 
 // --- YARDIMCI FONKSİYONLAR ---
 async function handleAuth() {
-  // Demo Mode - No authentication required
-  const demoUsername = 'Giriş Yapmalısın ama sen bilirsin';
+  try {
+    // Puter ile GERÇEK giriş yapma penceresini açar
+    const user = await puter.auth.signIn();
+    
+    // Giriş başarılıysa çalışır
+    isUserSignedIn = true;
+    document.getElementById('username').innerText = user.username;
+    document.getElementById('user-avatar').innerText = (user.username || 'U').charAt(0).toUpperCase();
 
-  isUserSignedIn = true;
-  document.getElementById('username').innerText = demoUsername;
-  document.getElementById('user-avatar').innerText = demoUsername.charAt(0).toUpperCase();
+    const authBtnParent = document.querySelector('#auth-btn-text')?.parentElement;
+    if (authBtnParent) {
+      authBtnParent.style.display = 'none';
+    }
 
-  const authBtnParent = document.querySelector('#auth-btn-text')?.parentElement;
-  if (authBtnParent) {
-    authBtnParent.style.display = 'none';
+    await loadChats();
+
+    if (chats.length > 0) {
+      loadChatToUI(chats[0].id);
+    }
+    
+    console.log('✅ Puter girişi başarılı:', user.username);
+    
+  } catch (err) {
+    console.error('Giriş iptal edildi veya hata oluştu:', err);
   }
-
-  await loadChats();
-
-  if (chats.length > 0) {
-    loadChatToUI(chats[0].id);
-  }
-
-  console.log('✅ Demo mode - authentication bypassed');
 }
 
 async function saveChats() {
@@ -837,6 +843,7 @@ async function deployCode(btn) {
     const finalSubdomain = site.subdomain || subdomain;
     const url = `https://${finalSubdomain}.puter.site`;
 
+    // ... (devamı aynen kalıyor)
     btn.className =
       'text-xs bg-green-600 hover:bg-green-700 text-white px-3 py-2 rounded-lg flex items-center gap-2 transition-colors';
     btn.innerHTML = `<i data-lucide="external-link" class="w-3 h-3"></i> ${finalSubdomain}`;
@@ -850,13 +857,13 @@ async function deployCode(btn) {
     btn.innerHTML = `⚠️ Hata`;
     console.error('(gerek var mı deploy etmeye zaten puter js nin bedava deploy özelliği var)Deploy Hatası Detayı:', err);
 
-    setTimeout(() => {
+setTimeout(() => {
       btn.innerHTML = originalHtml;
       btn.className = originalClass; // Orijinal class'a dön
       btn.disabled = false;
     }, 3000);
   }
-
+}
   if (typeof lucide !== 'undefined') {
     lucide.createIcons();
   }
